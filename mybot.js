@@ -1,8 +1,9 @@
+require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
 const TronWeb = require('tronweb');
-const token = "6163872748:AAFTTSgOJQ-9haJlhz_jMaz9-zHn8diutDI";
-const adminUserIds = [709027639];
+const token = process.env.TOKEN;
+const adminUserIds = process.env.ADMIN;
 const bot = new TelegramBot(token, { polling: true });
 const db = new sqlite3.Database('mydatabase.db');
 const userStates = {}
@@ -145,7 +146,7 @@ async function generateTronAddress(userId) {
     }
 }
 const testPaymentEvent = {
-    userId: 709027639, //717989011
+    userId: adminUserIds, //717989011
     amount: 10.0,
 };
 
