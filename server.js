@@ -58,6 +58,8 @@ bot.onText(/\/add_funds/, async (msg) => {
         const fundsText = `Пополните свой баланс, отправив TRX на адрес: ${tronAddress.base58}`;
         await bot.sendMessage(chatId, fundsText);
         console.log(tronAddress)
+        bot.emit('tronPayment', testPaymentEvent);
+
     } catch (error) {
         console.error('Произошла ошибка при генерации или сохранении Tron-адреса:', error.message);
         await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -129,7 +131,7 @@ async function updateBalance(userId, amount) {
 async function handleSuccessfulRecharge(userId, amount) {
     // Ваша логика здесь, например, отправка уведомления пользователю
     if (userId) {
-        const rechargeMessage = `Ваш баланс успешно пополнен на ${amount} TRX!`;
+        const rechargeMessage = `Ваш баланс успешно пополнен на ${amount}!`;
         await bot.sendMessage(userId, rechargeMessage);
     }
 }
@@ -143,12 +145,9 @@ async function generateTronAddress(userId) {
     }
 }
 const testPaymentEvent = {
-    userId: 709027639,
+    userId: 709027639, //717989011
     amount: 10.0,
 };
-
-// Затем вызываем обработчик события tronPayment
-bot.emit('tronPayment', testPaymentEvent);
 
 bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
