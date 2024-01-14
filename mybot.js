@@ -831,7 +831,7 @@ bot.onText(/\/add_insta_rk/, async (msg) => {
         }
     }
 });
-// 
+// 717989011
 bot.onText(/\/add_pb_privat/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -2175,7 +2175,7 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
-                        const adminId = 709027639; // Замените на актуальный идентификатор админа
+                        const adminId = 717989011; // Замените на актуальный идентификатор админа
                         if (photoInfo && photoInfo.file_id) {
                             await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
                         } else {
@@ -2203,7 +2203,7 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0]
-                        const adminId = 709027639; // Замените на актуальный идентификатор админа
+                        const adminId = 717989011; // Замените на актуальный идентификатор админа
                         if (photoInfo && photoInfo.file_id) {
                             await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
                         } else {
@@ -2231,7 +2231,7 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
-                        const adminId = 709027639; // Замените на актуальный идентификатор админа
+                        const adminId = 717989011; // Замените на актуальный идентификатор админа
                         if (photoInfo && photoInfo.file_id) {
                             await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
                         } else {
