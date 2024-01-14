@@ -831,7 +831,7 @@ bot.onText(/\/add_insta_rk/, async (msg) => {
         }
     }
 });
-// 717989011
+// 
 bot.onText(/\/add_pb_privat/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
