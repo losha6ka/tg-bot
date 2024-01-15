@@ -2,7 +2,7 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
-const adminUserIds = [71798901122, 709027639];
+const adminUserIds = [717989011, 709027639];
 // const adminID=
 const bot = new TelegramBot(token, { polling: true });
 const db = new sqlite3.Database('mydatabase.db');
