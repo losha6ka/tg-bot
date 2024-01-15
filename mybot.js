@@ -1424,7 +1424,7 @@ async function getAvailableProxyVodafone() {
     return new Promise((resolve, reject) => {
         db.all("SELECT * FROM proxy_vodafone", (err, rows) => {
             if (err) {
-                console.error('Ошибка при получении списка доступных авторегов:', err);
+                console.error('Ошибка при получении списка доступных proxy vodafone:', err);
                 reject(err);
             } else {
                 resolve(rows);
@@ -1557,7 +1557,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'auto_reg_ua':
             try {
-                const autoRegs = await getAvailableAutoRegs(userId); // Получаем доступные автореги для пользователя
+                const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(autoRegs.map(autoReg => autoReg.price));
@@ -1616,7 +1616,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'insta_bm':
             try {
-                const instaBms = await getAvailableInstaBm(userId); // Получаем доступные автореги для пользователя
+                const instaBms = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(instaBms.map(autoReg => autoReg.price));
@@ -1652,7 +1652,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'insta_bm_fp':
             try {
-                const instaBmsFp = await getAvailableInstaBmFp(userId); // Получаем доступные автореги для пользователя
+                const instaBmsFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(instaBmsFp.map(autoReg => autoReg.price));
@@ -1688,7 +1688,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'insta_bm_fp_rk':
             try {
-                const instaBmsFpRk = await getAvailableInstaBmFpRk(userId); // Получаем доступные автореги для пользователя
+                const instaBmsFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(instaBmsFpRk.map(autoReg => autoReg.price));
@@ -1750,7 +1750,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'cards_for_pb_privat':
             try {
-                const privats = await getAvailablePbPrivat(userId); // Получаем доступные автореги для пользователя
+                const privats = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(privats.map(autoReg => autoReg.price));
@@ -1783,7 +1783,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'cards_for_pb_monobank':
             try {
-                const mono = await getAvailablePbMono(userId); // Получаем доступные автореги для пользователя
+                const mono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(mono.map(autoReg => autoReg.price));
@@ -1816,7 +1816,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'cards_for_pb_a_bank':
             try {
-                const abank = await getAvailablePbAbank(userId); // Получаем доступные автореги для пользователя
+                const abank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(abank.map(autoReg => autoReg.price));
@@ -1850,7 +1850,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'cards_for_pb_sens':
             try {
-                const sens = await getAvailablePbSens(userId); // Получаем доступные автореги для пользователя
+                const sens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(sens.map(autoReg => autoReg.price));
@@ -1908,7 +1908,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'proxy_vodafone':
             try {
-                const vodafone = await getAvailableProxyVodafone(userId); // Получаем доступные автореги для пользователя
+                const vodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(vodafone.map(autoReg => autoReg.price));
@@ -1918,10 +1918,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const vodafoneKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | ${price || 10}$ | Кол-во: ${vodafone.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$`,
                             callback_data: `vodafone_info`
                         }]),
-                        ...(vodafone.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(vodafone.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -1941,7 +1941,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'proxy_life':
             try {
-                const life = await getAvailableProxyLife(userId); // Получаем доступные автореги для пользователя
+                const life = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(life.map(autoReg => autoReg.price));
@@ -1951,10 +1951,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const lifeKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | ${price || 10}$ | Кол-во: ${life.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$`,
                             callback_data: `life_info`
                         }]),
-                        ...(life.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(life.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -1974,7 +1974,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'proxy_kyivstar':
             try {
-                const kyivstar = await getAvailableProxyKyivstar(userId); // Получаем доступные автореги для пользователя
+                const kyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(kyivstar.map(autoReg => autoReg.price));
@@ -1984,10 +1984,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const kyivstarKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | ${price || 10}$ | Кол-во: ${kyivstar.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$`,
                             callback_data: `kyivstar_info`
                         }]),
-                        ...(kyivstar.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(kyivstar.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -2089,9 +2089,9 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'farm_ua':
             try {
-                const farmUa7D = await getAvailableFarmUa7D(userId); // Получаем доступные автореги для пользователя
-                const farmUa14D = await getAvailableFarmUa14D(userId); // Получаем доступные автореги для пользователя
-                const farmUa30D = await getAvailableFarmUa30D(userId); // Получаем доступные автореги для пользователя
+                const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices7D = new Set(farmUa7D.map(farmUa => farmUa.price));
                 const uniquePrices14D = new Set(farmUa14D.map(farmUa => farmUa.price));
@@ -2251,7 +2251,7 @@ bot.on('callback_query', async (callbackQuery) => {
             });
             break;
         case 'ua_farm_7_days':
-            const farmUa7D = await getAvailableFarmUa7D(userId); // Получаем доступные автореги для пользователя
+            const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
 
             if (farmUa7D.length > 0) {
                 const farmUa7DPrice = farmUa7D[0].price;
@@ -2314,7 +2314,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'ua_farm_14_days':
-            const farmUa14D = await getAvailableFarmUa14D(userId); // Получаем доступные автореги для пользователя
+            const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
 
             if (farmUa14D.length > 0) {
                 const farmUa14DPrice = farmUa14D[0].price;
@@ -2377,7 +2377,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'ua_farm_30_days':
-            const farmUa30D = await getAvailableFarmUa30D(userId); // Получаем доступные автореги для пользователя
+            const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
 
             if (farmUa30D.length > 0) {
                 const farmUa30DPrice = farmUa30D[0].price;
@@ -2440,7 +2440,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'auto_reg_ua_fp':
-            const autoRegs = await getAvailableAutoRegs(userId); // Получаем доступные автореги для пользователя
+            const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
 
             if (autoRegs.length > 0) {
                 const firstAutoRegPrice = autoRegs[0].price;
@@ -2490,7 +2490,7 @@ bot.on('callback_query', async (callbackQuery) => {
             }
             break;
         case 'insta_bm_info':
-            const instaBm = await getAvailableInstaBm(userId); // Получаем доступные автореги для пользователя
+            const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
 
             if (instaBm.length > 0) {
                 const instaBmPrice = instaBm[0].price;
@@ -2527,7 +2527,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'insta_bm_fp_info':
-            const instaBmFp = await getAvailableInstaBmFp(userId); // Получаем доступные автореги для пользователя
+            const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
 
             if (instaBmFp.length > 0) {
                 const instaBmFpPrice = instaBmFp[0].price;
@@ -2564,7 +2564,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'insta_bm_fp_rk_info':
-            const instaBmFpRk = await getAvailableInstaBmFpRk(userId); // Получаем доступные автореги для пользователя
+            const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
 
             if (instaBmFpRk.length > 0) {
                 const instaBmFpRkPrice = instaBmFpRk[0].price;
@@ -2601,7 +2601,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'privat_info':
-            const pbPrivat = await getAvailablePbPrivat(userId); // Получаем доступные автореги для пользователя
+            const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
 
             if (pbPrivat.length > 0) {
                 const pbPrivatPrice = pbPrivat[0].price;
@@ -2636,7 +2636,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'monobank_info':
-            const pbMono = await getAvailablePbMono(userId); // Получаем доступные автореги для пользователя
+            const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
 
             if (pbMono.length > 0) {
                 const pbMonoPrice = pbMono[0].price;
@@ -2671,7 +2671,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'a_bank_info':
-            const pbAbank = await getAvailablePbAbank(userId); // Получаем доступные автореги для пользователя
+            const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
 
             if (pbAbank.length > 0) {
                 const pbAbankPrice = pbAbank[0].price;
@@ -2706,7 +2706,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'sens_info':
-            const pbSens = await getAvailablePbSens(userId); // Получаем доступные автореги для пользователя
+            const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
 
             if (pbSens.length > 0) {
                 const pbSensPrice = pbSens[0].price;
@@ -2741,7 +2741,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
             break;
         case 'vodafone_info':
-            const proxyVodafone = await getAvailableProxyVodafone(userId); // Получаем доступные автореги для пользователя
+            const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
 
             if (proxyVodafone.length > 0) {
                 const proxyVodafonePrice = proxyVodafone[0].price;
@@ -2781,7 +2781,7 @@ IP/Port/Log/Pass + информация
 
             break;
         case 'life_info':
-            const proxyLife = await getAvailableProxyLife(userId); // Получаем доступные автореги для пользователя
+            const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
 
             if (proxyLife.length > 0) {
                 const proxyLifePrice = proxyLife[0].price;
@@ -2821,7 +2821,7 @@ IP/Port/Log/Pass + информация
 
             break;
         case 'kyivstar_info':
-            const proxyKyivstar = await getAvailableProxyKyivstar(userId); // Получаем доступные автореги для пользователя
+            const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
 
             if (proxyKyivstar.length > 0) {
                 const proxyKyivstarPrice = proxyKyivstar[0].price;
@@ -2862,7 +2862,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_purchase':
             try {
-                const autoRegs = await getAvailableAutoRegs(userId); // Получаем доступные автореги для пользователя
+                const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
                 if (autoRegs && autoRegs.length > 0) {
                     const autoReg = autoRegs[0];
 
@@ -2896,7 +2896,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_farm_ua_7d':
             try {
-                const farmUa7D = await getAvailableFarmUa7D(userId); // Получаем доступные автореги для пользователя
+                const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
                 if (farmUa7D && farmUa7D.length > 0) {
                     const farmUa7d = farmUa7D[0];
 
@@ -2930,7 +2930,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_farm_ua_14d':
             try {
-                const farmUa14D = await getAvailableFarmUa14D(userId); // Получаем доступные автореги для пользователя
+                const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
                 if (farmUa14D && farmUa14D.length > 0) {
                     const farmUa14d = farmUa14D[0];
 
@@ -2964,7 +2964,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_farm_ua_30d':
             try {
-                const farmUa30D = await getAvailableFarmUa30D(userId); // Получаем доступные автореги для пользователя
+                const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
                 if (farmUa30D && farmUa30D.length > 0) {
                     const farmUa30d = farmUa30D[0];
 
@@ -2998,7 +2998,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_insta_bm':
             try {
-                const instaBm = await getAvailableInstaBm(userId); // Получаем доступные автореги для пользователя
+                const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
                 if (instaBm && instaBm.length > 0) {
                     const instaBM = instaBm[0];
 
@@ -3032,7 +3032,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_insta_bm_fp':
             try {
-                const instaBmFp = await getAvailableInstaBmFp(userId); // Получаем доступные автореги для пользователя
+                const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
                 if (instaBmFp && instaBmFp.length > 0) {
                     const instaBMFP = instaBmFp[0];
 
@@ -3066,7 +3066,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_insta_bm_fp_rk':
             try {
-                const instaBmFpRk = await getAvailableInstaBmFpRk(userId); // Получаем доступные автореги для пользователя
+                const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                 if (instaBmFpRk && instaBmFpRk.length > 0) {
                     const instaBMFPRK = instaBmFpRk[0];
 
@@ -3100,7 +3100,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_privat':
             try {
-                const pbPrivat = await getAvailablePbPrivat(userId); // Получаем доступные автореги для пользователя
+                const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
                 if (pbPrivat && pbPrivat.length > 0) {
                     const pbPrivats = pbPrivat[0];
 
@@ -3134,7 +3134,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_mono':
             try {
-                const pbMono = await getAvailablePbMono(userId); // Получаем доступные автореги для пользователя
+                const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
                 if (pbMono && pbMono.length > 0) {
                     const pbMonos = pbMono[0];
 
@@ -3168,7 +3168,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_abank':
             try {
-                const pbAbank = await getAvailablePbAbank(userId); // Получаем доступные автореги для пользователя
+                const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
                 if (pbAbank && pbAbank.length > 0) {
                     const pbAbanks = pbAbank[0];
 
@@ -3202,7 +3202,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_sens':
             try {
-                const pbSens = await getAvailablePbSens(userId); // Получаем доступные автореги для пользователя
+                const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
                 if (pbSens && pbSens.length > 0) {
                     const pbSenss = pbSens[0];
 
@@ -3236,7 +3236,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_vodafone':
             try {
-                const proxyVodafone = await getAvailableProxyKyivstar(userId); // Получаем доступные автореги для пользователя
+                const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
                 if (proxyVodafone && proxyVodafone.length > 0) {
                     const proxyVodafones = proxyVodafone[0];
 
@@ -3254,7 +3254,7 @@ IP/Port/Log/Pass + информация
                     await removeProxyVodafone(proxyVodafones.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${proxyVodafones.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
@@ -3270,7 +3270,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_life':
             try {
-                const proxyLife = await getAvailableProxyLife(userId); // Получаем доступные автореги для пользователя
+                const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
                 if (proxyLife && proxyLife.length > 0) {
                     const proxyLifes = proxyLife[0];
 
@@ -3288,7 +3288,7 @@ IP/Port/Log/Pass + информация
                     await removeProxyLife(proxyLifes.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${proxyLifes.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
@@ -3304,7 +3304,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'confirm_kyivstar':
             try {
-                const proxyKyivstar = await getAvailableProxyKyivstar(userId); // Получаем доступные автореги для пользователя
+                const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
                 if (proxyKyivstar && proxyKyivstar.length > 0) {
                     const proxyKyivstars = proxyKyivstar[0];
 
@@ -3322,7 +3322,7 @@ IP/Port/Log/Pass + информация
                     await removeProxyKyivstar(proxyKyivstars.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${proxyKyivstars.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
@@ -3338,8 +3338,7 @@ IP/Port/Log/Pass + информация
             break;
 
         default:
-            // Обработка других действий
             break;
     }
 });
-
+// 
