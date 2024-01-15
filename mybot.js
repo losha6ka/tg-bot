@@ -179,6 +179,7 @@ bot.onText(/\/help/, async (msg) => {
         const commands = `
 \nПополнить счёт пользователя - /add_funds 
 \nДобавить авторег -  /add_auto_reg
+\nДобавить пост -  /add_post
 \nДобавить Farm UA 7дней - /add_farm_ua_7d
 \nДобавить Farm UA 14дней - /add_farm_ua_14d
 \nДобавить Farm UA 30дней - /add_farm_ua_30d
@@ -244,7 +245,65 @@ bot.onText(/\/add_funds/, async (msg) => {
         }
     }
 });
+bot.onText(/\/add_post/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
 
+    if (adminUserIds.includes(userId)) {
+        try {
+            // Запрос текста для поста
+            const askPostMessage = await bot.sendMessage(chatId, 'Введите текст для поста:');
+
+            // Ожидание текстового ответа с текстом поста
+            bot.once('text', async (textMsg) => {
+                const postText = textMsg.text;
+
+                // Удаление сообщения с запросом текста поста
+                await bot.deleteMessage(chatId, askPostMessage.message_id);
+
+                // Подготовка клавиатуры подтверждения
+                const confirmNewPostKeyboard = {
+                    inline_keyboard: [
+                        [{ text: 'Опубликовать пост', callback_data: 'confirm_post' }],
+                    ],
+                };
+
+                // Отправка сообщения с текстом поста и клавиатурой подтверждения
+                const askAmountMessage = await bot.sendMessage(chatId, `Пост:\n${postText}`, {
+                    parse_mode: 'Markdown',
+                    reply_markup: confirmNewPostKeyboard,
+                });
+
+                // Ожидание нажатия на кнопку "Опубликовать пост"
+                bot.once('callback_query', async (query) => {
+                    const data = query.data;
+                    const messageId = askAmountMessage.message_id;
+
+                    if (data === 'confirm_post') {
+                        try {
+                            // Получение всех пользовательских идентификаторов
+                            const allUserIds = await getAllUsersId();
+
+                            // Отправка поста каждому пользователю
+                            for (const userId of allUserIds) {
+                                try {
+                                    await bot.sendMessage(userId, `${postText}`, { parse_mode: 'MarkdownV2' });
+                                } catch (error) {
+                                    console.error(`Ошибка при отправке поста пользователю ${userId}:`, error.message);
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Ошибка при получении пользовательских идентификаторов:', error.message);
+                        }
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Произошла ошибка:', error.message);
+            await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+        }
+    }
+});
 function addUserToDatabase(userId, login, chatId) {
     return new Promise((resolve, reject) => {
         db.get("SELECT * FROM users WHERE id = ?", [userId], (err, row) => {
@@ -292,7 +351,7 @@ async function makePurchase(userId, purchaseAmount) {
 async function notifyUser(userId, amount) {
     // Используйте ваш механизм отправки уведомлений, например, Telegram Bot API
     const chatId = await getChatId(userId);
-    const notificationText = `Ваш баланс пополнен на ${amount}. Новый баланс: ${await getBalance(userId)}`;
+    const notificationText = `Ваш баланс пополнен на ${amount}$. Новый баланс: ${await getBalance(userId)}$`;
     await bot.sendMessage(chatId, notificationText);
 }
 async function getBalance(userId) {
@@ -302,6 +361,19 @@ async function getBalance(userId) {
                 reject(err);
             } else {
                 resolve(row.balance);
+            }
+        });
+    });
+}
+async function getAllUsersId() {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT id FROM users", (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                // Извлечь все идентификаторы из массива объектов результатов
+                const userIds = rows.map(row => row.id);
+                resolve(userIds);
             }
         });
     });
@@ -2215,12 +2287,17 @@ bot.on('callback_query', async (callbackQuery) => {
                 const copyBinance = `<code>391483018</code>`;
 
                 if (!isNaN(enteredAmount)) {
-                    const fundsBinanceText = `Вы можете произвести оплату ${enteredAmount}$ по Binance\n${copyBinance}\nДля подтверждения платежа обязательно пришлите скрин оплаты.`;
+                    const fundsBinanceText = `Вы можете произвести оплату ${enteredAmount}$ по Binance\n${copyBinance}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsBinanceText, { parse_mode: 'HTML' });
 
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
+                        if (photoInfo && photoInfo.file_id) {
+                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
+                        } else {
+                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        }
                         for (const adminUserId of adminUserIds) {
                             if (photoInfo && photoInfo.file_id) {
                                 await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
@@ -2244,12 +2321,17 @@ bot.on('callback_query', async (callbackQuery) => {
                 const copyTron = `<code>TSgbGfsYGvCPNG7StbapVaNP727vrXBig9</code>`;
 
                 if (!isNaN(enteredAmount)) {
-                    const fundsCryptoText = `Вы можете произвести оплату ${enteredAmount}$ по Crypto\n${copyTron}\nДля подтверждения платежа обязательно пришлите скрин оплаты.`;
+                    const fundsCryptoText = `Вы можете произвести оплату ${enteredAmount}$ по Crypto\n${copyTron}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsCryptoText, { parse_mode: 'HTML' });
 
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0]
+                        if (photoInfo && photoInfo.file_id) {
+                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
+                        } else {
+                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        }
                         for (const adminUserId of adminUserIds) {
                             if (photoInfo && photoInfo.file_id) {
                                 const userIdCopy = `${userId}`
@@ -2274,12 +2356,17 @@ bot.on('callback_query', async (callbackQuery) => {
                 const copyCard = `<code>4028082011730940</code>`;
 
                 if (!isNaN(enteredAmount)) {
-                    const fundsUACardsText = `Вы можете произвести оплату ${enteredAmount}$ по украинской карте\n${copyCard}\nДля подтверждения платежа обязательно пришлите скрин оплаты.`;
+                    const fundsUACardsText = `Вы можете произвести оплату ${enteredAmount}$ по украинской карте\n${copyCard}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsUACardsText, { parse_mode: 'HTML' });
 
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
+                        if (photoInfo && photoInfo.file_id) {
+                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
+                        } else {
+                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        }
                         for (const adminUserId of adminUserIds) {
                             if (photoInfo && photoInfo.file_id) {
                                 await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
@@ -2511,15 +2598,17 @@ bot.on('callback_query', async (callbackQuery) => {
 **ОСТАТОК:** ${autoRegs.length - 1 || 0}
                     `;
 
+                const quantityButtons = Array.from({ length: Math.min(9, autoRegs.length - 1) }, (_, index) => ({
+                    text: `${(index + 1).toString()}шт`,
+                    callback_data: `quantity_${index + 1}`
+                }));
+
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_purchase`
-                            }
-                        ]
-                    ]
+                        quantityButtons,
+                        [{ text: 'Подтвердить покупку', callback_data: 'confirm_purchase' }],
+                        [{ text: 'Вернуться назад', callback_data: 'auto_reg_ua' }],
+                    ],
                 };
 
                 // Отправляем сообщение с описанием и кнопкой подтверждения
@@ -2531,6 +2620,11 @@ bot.on('callback_query', async (callbackQuery) => {
                 // Обработка ошибки, если не удалось получить информацию об автореге
                 console.error('Ошибка при получении информации об автореге.');
             }
+            break;
+        case /^quantity_\d+$/:
+            const selectedQuantity = parseInt(query.data.split('_')[1]);
+            // Опционально, вы можете отправить сообщение, подтверждающее выбор количества
+            await bot.sendMessage(chatId, `Выбрано товаров: ${selectedQuantity}`);
             break;
         case 'insta_bm_info':
             const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
