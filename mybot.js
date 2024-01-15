@@ -182,9 +182,9 @@ bot.onText(/\/help/, async (msg) => {
 \nДобавить Farm UA 7дней - /add_farm_ua_7d
 \nДобавить Farm UA 14дней - /add_farm_ua_14d
 \nДобавить Farm UA 30дней - /add_farm_ua_30d
-\nДобавить Insta BM - /add_insta_fp
+\nДобавить Insta BM - /add_insta_bm
 \nДобавить Insta BM + FP - /add_insta_rk
-\nДобавить Insta BM + FP + RK - /add_insta_bm
+\nДобавить Insta BM + FP + RK - /add_insta_fp
 \nДобавить ПБ приват - /add_pb_privat
 \nДобавить ПБ моно - /add_pb_mono
 \nДобавить ПБ абанк - /add_pb_abank
@@ -325,6 +325,7 @@ async function updateBalance(userId, amount) {
                 reject(err);
             } else {
                 console.log(`Баланс пользователя ${userId} обновлен на ${amount}`);
+                notifyUser(userId, amount)
                 resolve();
             }
         });
@@ -570,11 +571,15 @@ bot.onText(/\/add_auto_reg/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addAutoRegLink(link, price);
+                    const links = msg.text.split('\n');
+
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addAutoRegLink(link, price);
+                    }
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Авторег успешно добавлен.');
@@ -609,12 +614,15 @@ bot.onText(/\/add_farm_ua_7d/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addFarmUaLink7D(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addFarmUaLink7D(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
 
@@ -647,12 +655,15 @@ bot.onText(/\/add_farm_ua_14d/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addFarmUaLink14D(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addFarmUaLink14D(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
 
@@ -685,12 +696,15 @@ bot.onText(/\/add_farm_ua_30d/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addFarmUaLink30D(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addFarmUaLink30D(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
 
@@ -724,12 +738,15 @@ bot.onText(/\/add_insta_bm/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addInstaBmLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addInstaBmLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBm успешно добавлен.');
 
@@ -762,12 +779,15 @@ bot.onText(/\/add_insta_fp/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addInstaBmFpLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addInstaBmFpLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBmFp успешно добавлен.');
 
@@ -800,12 +820,15 @@ bot.onText(/\/add_insta_rk/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addInstaBmFpRkLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addInstaBmFpRkLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBmFpRk успешно добавлен.');
 
@@ -839,12 +862,15 @@ bot.onText(/\/add_pb_privat/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addPbPrivatLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addPbPrivatLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Privat успешно добавлен.');
 
@@ -877,12 +903,15 @@ bot.onText(/\/add_pb_mono/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addPbMonoLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addPbMonoLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Mono успешно добавлен.');
 
@@ -915,12 +944,15 @@ bot.onText(/\/add_pb_abank/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addPbAbankLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addPbAbankLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Abank успешно добавлен.');
 
@@ -953,12 +985,15 @@ bot.onText(/\/add_pb_sens/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addPbSensLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addPbSensLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Sens успешно добавлен.');
 
@@ -992,12 +1027,15 @@ bot.onText(/\/add_proxy_vodafone/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addProxyVodafoneLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addProxyVodafoneLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Vodafone успешно добавлен.');
 
@@ -1030,12 +1068,15 @@ bot.onText(/\/add_proxy_life/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addProxyLifeLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addProxyLifeLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Life успешно добавлен.');
 
@@ -1068,12 +1109,15 @@ bot.onText(/\/add_proxy_kyivstar/, async (msg) => {
                     return;
                 }
 
-                const linkMessage = await bot.sendMessage(chatId, 'Введите ссылку на Google Диск:');
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
 
                 bot.once('text', async (msg) => {
-                    const link = msg.text;
-                    await addProxyKyivstarLink(link, price);
+                    const links = msg.text.split('\n');
 
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addProxyKyivstarLink(link, price);
+                    }
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Kyivstar успешно добавлен.');
 
