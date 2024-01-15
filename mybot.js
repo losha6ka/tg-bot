@@ -1,13 +1,12 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
-const TronWeb = require('tronweb');
 const token = process.env.TOKEN;
-const adminUserIds = process.env.ADMIN.split(',');
+const adminUserIds = [71798901122, 709027639];
+// const adminID=
 const bot = new TelegramBot(token, { polling: true });
 const db = new sqlite3.Database('mydatabase.db');
 const userStates = {}
-const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io', });// Замените на свой узел Tron
 // users
 db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -23,7 +22,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS auto_reg_links (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -32,7 +30,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS farm_ua_links7d (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -40,7 +37,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS farm_ua_links14d (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -48,7 +44,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS farm_ua_links30d (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -57,7 +52,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS insta_bm (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -65,7 +59,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS insta_bm_fp (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -73,7 +66,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS insta_bm_fp_rk (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -82,7 +74,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS pb_privat (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -90,7 +81,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS pb_mono (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -98,7 +88,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS pb_abank (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -106,7 +95,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS pb_sens (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -115,7 +103,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS proxy_vodafone (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -123,7 +110,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS proxy_life (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -131,7 +117,6 @@ db.run(`
 db.run(`
     CREATE TABLE IF NOT EXISTS proxy_kyivstar (
         id INTEGER PRIMARY KEY,
-        user_id INTEGER,
         link TEXT,
         price INTEGER
     );
@@ -169,11 +154,11 @@ bot.onText(/\/menu/, async (msg) => {
         const mainKeyboard = {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: 'Мой профиль', callback_data: 'my_profile' }],
-                    [{ text: 'Купить', callback_data: 'buy' }],
-                    [{ text: 'Пополнить баланс', callback_data: 'add_funds' }],
-                    [{ text: 'Поддержка', callback_data: 'support' },
-                    { text: 'Правила', callback_data: 'rules' }],
+                    [{ text: '🤖 Мой профиль', callback_data: 'my_profile' }],
+                    [{ text: '💰 Купить', callback_data: 'buy' }],
+                    [{ text: '💳 Пополнить баланс', callback_data: 'add_funds' }],
+                    [{ text: '🛠 Поддержка', callback_data: 'support' },
+                    { text: '📃 Правила', callback_data: 'rules' }],
                 ],
             },
         };
@@ -191,7 +176,7 @@ bot.onText(/\/help/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
 
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
         const commands = `
 \nПополнить счёт пользователя - /add_funds 
 \nДобавить авторег -  /add_auto_reg
@@ -217,7 +202,7 @@ bot.onText(/\/add_funds/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
 
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
         try {
             // Запрос ID пользователя для пополнения
             const askUserIdMessage = await bot.sendMessage(chatId, 'Введите ID пользователя для пополнения:');
@@ -296,8 +281,14 @@ bot.on('tronPayment', async (payment) => {
         console.error('Произошла ошибка при обновлении баланса:', error);
     }
 });
-function makePurchase(userId) {
-    db.run("UPDATE users SET totalPurchases = totalPurchases + 1 WHERE id = ?", [userId]);
+async function makePurchase(userId, purchaseAmount) {
+    try {
+        // После успешного списания с баланса обновляем количество покупок
+        db.run("UPDATE users SET totalPurchases = totalPurchases + ? WHERE id = ?", [purchaseAmount, userId]);
+    } catch (error) {
+        console.error('Произошла ошибка при совершении покупки:', error);
+        throw error; // Можете обработать ошибку в соответствии с вашими потребностями
+    }
 }
 async function notifyUser(userId, amount) {
     // Используйте ваш механизм отправки уведомлений, например, Telegram Bot API
@@ -347,7 +338,7 @@ async function deductBalance(userId, amount) {
                 console.error('Ошибка при списании с баланса:', err);
                 reject(err);
             } else {
-                makePurchase(userId)
+                makePurchase(userId, amount); // Передаем сумму покупки в функцию makePurchase
                 resolve();
             }
         });
@@ -566,7 +557,7 @@ async function getUserById(userId) {
 bot.onText(/\/add_auto_reg/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -584,7 +575,7 @@ bot.onText(/\/add_auto_reg/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addAutoRegLink(userId, link, price);
+                    await addAutoRegLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Авторег успешно добавлен.');
@@ -605,7 +596,7 @@ bot.onText(/\/add_auto_reg/, async (msg) => {
 bot.onText(/\/add_farm_ua_7d/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -623,7 +614,7 @@ bot.onText(/\/add_farm_ua_7d/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addFarmUaLink7D(userId, link, price);
+                    await addFarmUaLink7D(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
@@ -643,7 +634,7 @@ bot.onText(/\/add_farm_ua_7d/, async (msg) => {
 bot.onText(/\/add_farm_ua_14d/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -661,7 +652,7 @@ bot.onText(/\/add_farm_ua_14d/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addFarmUaLink14D(userId, link, price);
+                    await addFarmUaLink14D(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
@@ -681,7 +672,7 @@ bot.onText(/\/add_farm_ua_14d/, async (msg) => {
 bot.onText(/\/add_farm_ua_30d/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -699,7 +690,7 @@ bot.onText(/\/add_farm_ua_30d/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addFarmUaLink30D(userId, link, price);
+                    await addFarmUaLink30D(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Farm UA успешно добавлен.');
@@ -720,7 +711,7 @@ bot.onText(/\/add_farm_ua_30d/, async (msg) => {
 bot.onText(/\/add_insta_bm/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -738,7 +729,7 @@ bot.onText(/\/add_insta_bm/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addInstaBmLink(userId, link, price);
+                    await addInstaBmLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBm успешно добавлен.');
@@ -758,7 +749,7 @@ bot.onText(/\/add_insta_bm/, async (msg) => {
 bot.onText(/\/add_insta_fp/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -776,7 +767,7 @@ bot.onText(/\/add_insta_fp/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addInstaBmFpLink(userId, link, price);
+                    await addInstaBmFpLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBmFp успешно добавлен.');
@@ -796,7 +787,7 @@ bot.onText(/\/add_insta_fp/, async (msg) => {
 bot.onText(/\/add_insta_rk/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -814,7 +805,7 @@ bot.onText(/\/add_insta_rk/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addInstaBmFpRkLink(userId, link, price);
+                    await addInstaBmFpRkLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'InstaBmFpRk успешно добавлен.');
@@ -835,7 +826,7 @@ bot.onText(/\/add_insta_rk/, async (msg) => {
 bot.onText(/\/add_pb_privat/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -853,7 +844,7 @@ bot.onText(/\/add_pb_privat/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addPbPrivatLink(userId, link, price);
+                    await addPbPrivatLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Privat успешно добавлен.');
@@ -873,7 +864,7 @@ bot.onText(/\/add_pb_privat/, async (msg) => {
 bot.onText(/\/add_pb_mono/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -891,7 +882,7 @@ bot.onText(/\/add_pb_mono/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addPbMonoLink(userId, link, price);
+                    await addPbMonoLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Mono успешно добавлен.');
@@ -911,7 +902,7 @@ bot.onText(/\/add_pb_mono/, async (msg) => {
 bot.onText(/\/add_pb_abank/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -929,7 +920,7 @@ bot.onText(/\/add_pb_abank/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addPbAbankLink(userId, link, price);
+                    await addPbAbankLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Abank успешно добавлен.');
@@ -949,7 +940,7 @@ bot.onText(/\/add_pb_abank/, async (msg) => {
 bot.onText(/\/add_pb_sens/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -967,7 +958,7 @@ bot.onText(/\/add_pb_sens/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addPbSensLink(userId, link, price);
+                    await addPbSensLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'PB Sens успешно добавлен.');
@@ -988,7 +979,7 @@ bot.onText(/\/add_pb_sens/, async (msg) => {
 bot.onText(/\/add_proxy_vodafone/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -1006,7 +997,7 @@ bot.onText(/\/add_proxy_vodafone/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addProxyVodafoneLink(userId, link, price);
+                    await addProxyVodafoneLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Vodafone успешно добавлен.');
@@ -1026,7 +1017,7 @@ bot.onText(/\/add_proxy_vodafone/, async (msg) => {
 bot.onText(/\/add_proxy_life/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -1044,7 +1035,7 @@ bot.onText(/\/add_proxy_life/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addProxyLifeLink(userId, link, price);
+                    await addProxyLifeLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Life успешно добавлен.');
@@ -1064,7 +1055,7 @@ bot.onText(/\/add_proxy_life/, async (msg) => {
 bot.onText(/\/add_proxy_kyivstar/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    if (adminUserIds.includes(userId.toString())) {
+    if (adminUserIds.includes(userId)) {
 
 
         try {
@@ -1082,7 +1073,7 @@ bot.onText(/\/add_proxy_kyivstar/, async (msg) => {
 
                 bot.once('text', async (msg) => {
                     const link = msg.text;
-                    await addProxyKyivstarLink(userId, link, price);
+                    await addProxyKyivstarLink(link, price);
 
                     // Опционально: Отправьте сообщение об успешном добавлении
                     await bot.sendMessage(chatId, 'Proxy Kyivstar успешно добавлен.');
@@ -1100,9 +1091,9 @@ bot.onText(/\/add_proxy_kyivstar/, async (msg) => {
     }
 });
 // 
-async function getAvailableAutoRegs(userId) {
+async function getAvailableAutoRegs() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM auto_reg_links WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM auto_reg_links", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1112,10 +1103,10 @@ async function getAvailableAutoRegs(userId) {
         });
     });
 }
-async function addAutoRegLink(userId, link, price) {
+async function addAutoRegLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в auto_reg_links
-        db.run("INSERT INTO auto_reg_links (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO auto_reg_links ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1126,10 +1117,10 @@ async function addAutoRegLink(userId, link, price) {
         });
     });
 }
-async function addFarmUaLink7D(userId, link, price) {
+async function addFarmUaLink7D(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO farm_ua_links7d (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO farm_ua_links7d ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1140,10 +1131,10 @@ async function addFarmUaLink7D(userId, link, price) {
         });
     });
 }
-async function addFarmUaLink14D(userId, link, price) {
+async function addFarmUaLink14D(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO farm_ua_links14d (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO farm_ua_links14d ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1154,10 +1145,10 @@ async function addFarmUaLink14D(userId, link, price) {
         });
     });
 }
-async function addFarmUaLink30D(userId, link, price) {
+async function addFarmUaLink30D(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO farm_ua_links30d (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO farm_ua_links30d ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1168,10 +1159,10 @@ async function addFarmUaLink30D(userId, link, price) {
         });
     });
 }
-async function addInstaBmLink(userId, link, price) {
+async function addInstaBmLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO insta_bm (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO insta_bm ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1182,10 +1173,10 @@ async function addInstaBmLink(userId, link, price) {
         });
     });
 }
-async function addInstaBmFpLink(userId, link, price) {
+async function addInstaBmFpLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO insta_bm_fp (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO insta_bm_fp ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1196,10 +1187,10 @@ async function addInstaBmFpLink(userId, link, price) {
         });
     });
 }
-async function addInstaBmFpRkLink(userId, link, price) {
+async function addInstaBmFpRkLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO insta_bm_fp_rk (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO insta_bm_fp_rk ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1210,10 +1201,10 @@ async function addInstaBmFpRkLink(userId, link, price) {
         });
     });
 }
-async function addPbPrivatLink(userId, link, price) {
+async function addPbPrivatLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO pb_privat (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO pb_privat ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1224,10 +1215,10 @@ async function addPbPrivatLink(userId, link, price) {
         });
     });
 }
-async function addPbMonoLink(userId, link, price) {
+async function addPbMonoLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO pb_mono (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO pb_mono ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1238,10 +1229,10 @@ async function addPbMonoLink(userId, link, price) {
         });
     });
 }
-async function addPbAbankLink(userId, link, price) {
+async function addPbAbankLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO pb_abank (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO pb_abank ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1252,10 +1243,10 @@ async function addPbAbankLink(userId, link, price) {
         });
     });
 }
-async function addPbSensLink(userId, link, price) {
+async function addPbSensLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO pb_sens (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO pb_sens ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1266,10 +1257,10 @@ async function addPbSensLink(userId, link, price) {
         });
     });
 }
-async function addProxyVodafoneLink(userId, link, price) {
+async function addProxyVodafoneLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO proxy_vodafone (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO proxy_vodafone ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1280,10 +1271,10 @@ async function addProxyVodafoneLink(userId, link, price) {
         });
     });
 }
-async function addProxyLifeLink(userId, link, price) {
+async function addProxyLifeLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO proxy_life (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO proxy_life ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1294,10 +1285,10 @@ async function addProxyLifeLink(userId, link, price) {
         });
     });
 }
-async function addProxyKyivstarLink(userId, link, price) {
+async function addProxyKyivstarLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в farm_ua_links7d
-        db.run("INSERT INTO proxy_kyivstar (user_id, link, price) VALUES (?, ?, ?)", [userId, link, price], function (err) {
+        db.run("INSERT INTO proxy_kyivstar ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1309,9 +1300,9 @@ async function addProxyKyivstarLink(userId, link, price) {
     });
 }
 // 
-async function getAvailableFarmUa7D(userId) {
+async function getAvailableFarmUa7D() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM farm_ua_links7d WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM farm_ua_links7d", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1321,9 +1312,9 @@ async function getAvailableFarmUa7D(userId) {
         });
     });
 }
-async function getAvailableFarmUa14D(userId) {
+async function getAvailableFarmUa14D() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM farm_ua_links14d WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM farm_ua_links14d", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1333,9 +1324,9 @@ async function getAvailableFarmUa14D(userId) {
         });
     });
 }
-async function getAvailableFarmUa30D(userId) {
+async function getAvailableFarmUa30D() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM farm_ua_links30d WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM farm_ua_links30d", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1345,9 +1336,9 @@ async function getAvailableFarmUa30D(userId) {
         });
     });
 }
-async function getAvailableInstaBm(userId) {
+async function getAvailableInstaBm() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM insta_bm WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM insta_bm", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1357,9 +1348,9 @@ async function getAvailableInstaBm(userId) {
         });
     });
 }
-async function getAvailableInstaBmFp(userId) {
+async function getAvailableInstaBmFp() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM insta_bm_fp WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM insta_bm_fp", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1369,9 +1360,9 @@ async function getAvailableInstaBmFp(userId) {
         });
     });
 }
-async function getAvailableInstaBmFpRk(userId) {
+async function getAvailableInstaBmFpRk() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM insta_bm_fp_rk WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM insta_bm_fp_rk", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1381,9 +1372,9 @@ async function getAvailableInstaBmFpRk(userId) {
         });
     });
 }
-async function getAvailablePbPrivat(userId) {
+async function getAvailablePbPrivat() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM pb_privat WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM pb_privat", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1393,9 +1384,9 @@ async function getAvailablePbPrivat(userId) {
         });
     });
 }
-async function getAvailablePbMono(userId) {
+async function getAvailablePbMono() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM pb_mono WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM pb_mono", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1405,9 +1396,9 @@ async function getAvailablePbMono(userId) {
         });
     });
 }
-async function getAvailablePbAbank(userId) {
+async function getAvailablePbAbank() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM pb_abank WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM pb_abank", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1417,9 +1408,9 @@ async function getAvailablePbAbank(userId) {
         });
     });
 }
-async function getAvailablePbSens(userId) {
+async function getAvailablePbSens() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM pb_sens WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM pb_sens", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1429,9 +1420,9 @@ async function getAvailablePbSens(userId) {
         });
     });
 }
-async function getAvailableProxyVodafone(userId) {
+async function getAvailableProxyVodafone() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM proxy_vodafone WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM proxy_vodafone", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1441,9 +1432,9 @@ async function getAvailableProxyVodafone(userId) {
         });
     });
 }
-async function getAvailableProxyLife(userId) {
+async function getAvailableProxyLife() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM proxy_life WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM proxy_life", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1453,9 +1444,9 @@ async function getAvailableProxyLife(userId) {
         });
     });
 }
-async function getAvailableProxyKyivstar(userId) {
+async function getAvailableProxyKyivstar() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM proxy_kyivstar WHERE user_id = ?", [userId], (err, rows) => {
+        db.all("SELECT * FROM proxy_kyivstar", (err, rows) => {
             if (err) {
                 console.error('Ошибка при получении списка доступных авторегов:', err);
                 reject(err);
@@ -1480,8 +1471,8 @@ bot.on('callback_query', async (callbackQuery) => {
                     const profileKeyboard = {
                         inline_keyboard: [
                             [{ text: `Логин: ${row.login}`, callback_data: 'show_login' }],
-                            [{ text: `Баланс: ${row.balance}`, callback_data: 'show_balance' }],
-                            [{ text: `Сумма покупок: ${row.totalPurchases}`, callback_data: 'show_purchases' }],
+                            [{ text: `Баланс: ${row.balance}$`, callback_data: 'show_balance' }],
+                            [{ text: `Сумма покупок: ${row.totalPurchases}$`, callback_data: 'show_purchases' }],
                             [{ text: 'Вернуться назад', callback_data: 'back_to_main' }],
                         ],
                     };
@@ -1524,7 +1515,7 @@ bot.on('callback_query', async (callbackQuery) => {
             const manualFarmKeyboard = {
                 inline_keyboard: [
                     [{ text: 'Фарм UA', callback_data: 'farm_ua' }],
-                    [{ text: 'Пополнение по ГЕО', callback_data: 'geo_recharge' }],
+                    [{ text: 'Ожидайте новые ГЕО', callback_data: 'geo_recharge' }],
                     [{ text: 'Вернуться назад', callback_data: 'buy' }],
                 ],
             };
@@ -1547,7 +1538,7 @@ bot.on('callback_query', async (callbackQuery) => {
             const autoRegKeyboard = {
                 inline_keyboard: [
                     [{ text: 'Авторег UA', callback_data: 'auto_reg_ua' }],
-                    [{ text: 'Пополнение по ГЕО', callback_data: 'geo_recharge' }],
+                    [{ text: 'Ожидайте новые ГЕО', callback_data: 'geo_recharge' }],
                     [{ text: 'Вернуться назад', callback_data: 'buy' }],
                 ],
             };
@@ -1570,15 +1561,15 @@ bot.on('callback_query', async (callbackQuery) => {
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(autoRegs.map(autoReg => autoReg.price));
-
                 // Формируем клавиатуру с уникальными ценами
                 const autoRegUaText = 'Авторег UA';
                 const autoRegUaKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Авторег UA + FP | Цена: ${price || 10} | Кол-во: ${autoRegs.filter(reg => reg.price === price).length || 0}`,
+                            text: `Авторег UA + FP | ${price || 0}$ | Кол-во: ${autoRegs.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `auto_reg_ua_fp`
                         }]),
+                        ...(autoRegs.length === 0 ? [[{ text: 'Авторег UA + FP | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'auto_reg' }],
                     ],
                 };
@@ -1635,9 +1626,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const instaBmKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Insta BM | Цена: ${price || 10} | Кол-во: ${instaBms.filter(reg => reg.price === price).length || 0}`,
+                            text: `Insta BM | ${price || 10}$ | Кол-во: ${instaBms.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_info`
                         }]),
+                        ...(instaBms.length === 0 ? [[{ text: 'Insta BM | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
                 };
@@ -1670,9 +1662,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const instaBmFpKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Insta BM + FP | Цена: ${price || 10} | Кол-во: ${instaBmsFp.filter(reg => reg.price === price).length || 0}`,
+                            text: `Insta BM + FP | ${price || 10}$ | Кол-во: ${instaBmsFp.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_fp_info`
                         }]),
+                        ...(instaBmsFp.length === 0 ? [[{ text: 'Insta BM + FP | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
                 };
@@ -1705,9 +1698,11 @@ bot.on('callback_query', async (callbackQuery) => {
                 const instaBmFpRkKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Insta BM + FP + PK | Цена: ${price || 10} | Кол-во: ${instaBmsFpRk.filter(reg => reg.price === price).length || 0}`,
+                            text: `Insta BM + FP + PK | ${price || 10}$ | Кол-во: ${instaBmsFpRk.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_fp_rk_info`
                         }]),
+                        ...(instaBmsFpRk.length === 0 ? [[{ text: 'Insta BM + FP + PK | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
                 };
@@ -1765,9 +1760,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const privatKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Приват bin | Цена: ${price || 10} | Кол-во: ${privats.filter(reg => reg.price === price).length || 0}`,
+                            text: `Приват bin | ${price || 10}$ | Кол-во: ${privats.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `privat_info`
                         }]),
+                        ...(privats.length === 0 ? [[{ text: 'Приват bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1797,9 +1793,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const monoKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Монобанк bin | Цена: ${price || 10} | Кол-во: ${mono.filter(reg => reg.price === price).length || 0}`,
+                            text: `Монобанк bin | ${price || 10}$ | Кол-во: ${mono.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `mono_info`
                         }]),
+                        ...(mono.length === 0 ? [[{ text: 'Монобанк bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1829,9 +1826,11 @@ bot.on('callback_query', async (callbackQuery) => {
                 const abankKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `А-банк bin | Цена: ${price || 10} | Кол-во: ${abank.filter(reg => reg.price === price).length || 0}`,
+                            text: `А-банк bin | ${price || 10}$ | Кол-во: ${abank.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `a_bank_info`
                         }]),
+                        ...(abank.length === 0 ? [[{ text: 'А-банк bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1861,9 +1860,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const sensKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Сенс bin | Цена: ${price || 10} | Кол-во: ${sens.filter(reg => reg.price === price).length || 0}`,
+                            text: `Сенс bin | ${price || 10}$ | Кол-во: ${sens.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `sens_info`
                         }]),
+                        ...(sens.length === 0 ? [[{ text: 'Сенс bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1918,9 +1918,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const vodafoneKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | Цена: ${price || 10} | Кол-во: ${vodafone.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$ | Кол-во: ${vodafone.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `vodafone_info`
                         }]),
+                        ...(vodafone.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -1950,9 +1951,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const lifeKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | Цена: ${price || 10} | Кол-во: ${life.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$ | Кол-во: ${life.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `life_info`
                         }]),
+                        ...(life.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -1982,9 +1984,10 @@ bot.on('callback_query', async (callbackQuery) => {
                 const kyivstarKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `30 дней | Цена: ${price || 10} | Кол-во: ${kyivstar.filter(reg => reg.price === price).length || 0}`,
+                            text: `30 дней | ${price || 10}$ | Кол-во: ${kyivstar.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `kyivstar_info`
                         }]),
+                        ...(kyivstar.length === 0 ? [[{ text: '30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -2006,11 +2009,11 @@ bot.on('callback_query', async (callbackQuery) => {
             const mainText = "Меню"
             const mainKeyboard = {
                 inline_keyboard: [
-                    [{ text: 'Мой профиль', callback_data: 'my_profile' }],
-                    [{ text: 'Купить', callback_data: 'buy' }],
-                    [{ text: 'Пополнить баланс', callback_data: 'add_funds' }],
-                    [{ text: 'Поддержка', callback_data: 'support' },
-                    { text: 'Правила', callback_data: 'rules' }],
+                    [{ text: '🤖 Мой профиль', callback_data: 'my_profile' }],
+                    [{ text: '💰 Купить', callback_data: 'buy' }],
+                    [{ text: '💳 Пополнить баланс', callback_data: 'add_funds' }],
+                    [{ text: '🛠 Поддержка', callback_data: 'support' },
+                    { text: '📃 Правила', callback_data: 'rules' }],
                 ],
             };
             if (bot.editMessageText && bot.editMessageReplyMarkup) {
@@ -2020,7 +2023,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 } else {
                     const sentRulesMessage = await bot.sendMessage(chatId, mainText, {
                         parse_mode: 'Markdown',
-                        reply_markup: rulesKeyboard,
+                        reply_markup: mainKeyboard,
                     })
                 }
             } else {
@@ -2065,10 +2068,9 @@ bot.on('callback_query', async (callbackQuery) => {
             }
             break;
         case 'support':
-            const supportText = "Поддержка"
+            const supportText = "Поддержка\n@r0yal13"
             const supportKeyboard = {
                 inline_keyboard: [
-                    [{ text: '@поддержка', callback_data: 'supprot_user' }],
                     [{ text: 'Вернуться назад', callback_data: 'back_to_main' }],
                 ],
             };
@@ -2090,9 +2092,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 const farmUa7D = await getAvailableFarmUa7D(userId); // Получаем доступные автореги для пользователя
                 const farmUa14D = await getAvailableFarmUa14D(userId); // Получаем доступные автореги для пользователя
                 const farmUa30D = await getAvailableFarmUa30D(userId); // Получаем доступные автореги для пользователя
-                console.log(farmUa7D)
-                console.log(farmUa14D)
-                console.log(farmUa30D)
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices7D = new Set(farmUa7D.map(farmUa => farmUa.price));
                 const uniquePrices14D = new Set(farmUa14D.map(farmUa => farmUa.price));
@@ -2103,17 +2102,21 @@ bot.on('callback_query', async (callbackQuery) => {
                 const farmUaKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices7D).map(price => [{
-                            text: `UA фарм 7 дней | Цена: ${price || "ошибка"} | Кол-во: ${farmUa7D.filter(reg => reg.price === price).length || 0}`,
+                            text: `UA фарм 7 дней | ${price || "ошибка"}$ | Кол-во: ${farmUa7D.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `ua_farm_7_days`
                         }]),
                         ...Array.from(uniquePrices14D).map(price => [{
-                            text: `UA фарм 14 дней | Цена: ${price || "ошибка"} | Кол-во: ${farmUa14D.filter(reg => reg.price === price).length || 0}`,
+                            text: `UA фарм 14 дней | ${price || "ошибка"}$ | Кол-во: ${farmUa14D.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `ua_farm_14_days`
                         }]),
                         ...Array.from(uniquePrices30D).map(price => [{
-                            text: `UA фарм 30 дней | Цена: ${price || "ошибка"} | Кол-во: ${farmUa30D.filter(reg => reg.price === price).length || 0}`,
+                            text: `UA фарм 30 дней | ${price || "ошибка"}$ | Кол-во: ${farmUa30D.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `ua_farm_30_days`
                         }]),
+                        ...(farmUa7D.length === 0 ? [[{ text: 'UA фарм 7 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(farmUa14D.length === 0 ? [[{ text: 'UA фарм 14 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(farmUa30D.length === 0 ? [[{ text: 'UA фарм 30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+
                         [{ text: 'Вернуться назад', callback_data: 'manual_farm' }],
                     ],
                 };
@@ -2140,7 +2143,7 @@ bot.on('callback_query', async (callbackQuery) => {
             const addFundsKeyboard = {
                 inline_keyboard: [
                     [{ text: 'Binance ID', callback_data: 'binance_id' }],
-                    [{ text: 'Криптовалюта (bitcoin/trc20/eth)', callback_data: 'crypto' }],
+                    [{ text: 'Криптовалюта (USDT TRC20)', callback_data: 'crypto' }],
                     [{ text: 'Украинская карта', callback_data: 'ua_card' }],
                     // Добавьте другие способы по необходимости
                     [{ text: 'Вернуться назад', callback_data: 'back_to_main' }],
@@ -2175,11 +2178,12 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
-                        const adminId = 717989011; // Замените на актуальный идентификатор админа
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        for (const adminUserId of adminUserIds) {
+                            if (photoInfo && photoInfo.file_id) {
+                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
+                            } else {
+                                console.error('Ошибка: Фото не содержит информацию о файле.');
+                            }
                         }
                     });
                 } else {
@@ -2203,11 +2207,13 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0]
-                        const adminId = 717989011; // Замените на актуальный идентификатор админа
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        for (const adminUserId of adminUserIds) {
+                            if (photoInfo && photoInfo.file_id) {
+                                const userIdCopy = `${userId}`
+                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userIdCopy}` });
+                            } else {
+                                console.error('Ошибка: Фото не содержит информацию о файле.');
+                            }
                         }
                     });
                 } else {
@@ -2231,11 +2237,12 @@ bot.on('callback_query', async (callbackQuery) => {
                     // Ожидание фото
                     bot.once('photo', async (photo) => {
                         const photoInfo = photo.photo[0];
-                        const adminId = 717989011; // Замените на актуальный идентификатор админа
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendPhoto(adminId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}\nID: ${userId}` });
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
+                        for (const adminUserId of adminUserIds) {
+                            if (photoInfo && photoInfo.file_id) {
+                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
+                            } else {
+                                console.error('Ошибка: Фото не содержит информацию о файле.');
+                            }
                         }
                     });
                 } else {
@@ -2249,36 +2256,40 @@ bot.on('callback_query', async (callbackQuery) => {
             if (farmUa7D.length > 0) {
                 const farmUa7DPrice = farmUa7D[0].price;
                 const uaFarm7Message = `
-\n*--- Мощный ручной фарм 7 дней ---*
-\n**Описание:**
-\n- Кинг/мамка/соц аккаунт полностью готов к использованию.
-\n- Регистрация и все действия производились на украинском IP.
-\n**Дополнительно:**
-\n- Женский пол
-\n- Имена аккаунтов на кириллице
-\n- Друзья 20-100
-\n- Нагулянные cookies (2000+)
-\n- 15+ рекламных интересов
-\n- Уникальные 8+ фото в профиле и ленте
-\n- 20+ постов/репостов
-\n- 2 адекватно и полностью заполненные Fan Page + 3 поста
-\n- Возраст 20-35
-\n- Привязана почта
-\n- Паспорт с вероятностью прохождения ЗРД 70%
-\n- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
-\n- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
-\n- Включен проф. режим
-\n- Установлена 2ФА
-\n- Пройден чек по "селфи"
-\n**В комплекте:**
-\n- Логин/пароль аккаунта ФБ + почта
-\n- Дата рождения
-\n- ID аккаунта
-\n- Cookies .JSON
-\n- USERAGENT
-\n- Селфи и паспорт для прохождения ЗРД
-\n**ЦЕНА:** ${farmUa7DPrice}
-\n**ОСТАТОК:** ${farmUa7D.length - 1 || 0}
+*--- Мощный ручной фарм 7 дней ---*
+
+**Описание:**
+- Кинг/мамка/соц аккаунт полностью готов к использованию.
+- Регистрация и все действия производились на украинском IP.
+
+**Дополнительно:**
+- Женский пол
+- Имена аккаунтов на кириллице
+- Друзья 20-100
+- Нагулянные cookies (2000+)
+- 15+ рекламных интересов
+- Уникальные 8+ фото в профиле и ленте
+- 20+ постов/репостов
+- 2 адекватно и полностью заполненные Fan Page + 3 поста
+- Возраст 20-35
+- Привязана почта
+- Паспорт с вероятностью прохождения ЗРД 70%
+- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
+- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
+- Включен проф. режим
+- Установлена 2ФА
+- Пройден чек по "селфи"
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- Селфи и паспорт для прохождения ЗРД
+
+**ЦЕНА:** ${farmUa7DPrice}$
+**ОСТАТОК:** ${farmUa7D.length - 1 || 0}
             `;
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2308,36 +2319,40 @@ bot.on('callback_query', async (callbackQuery) => {
             if (farmUa14D.length > 0) {
                 const farmUa14DPrice = farmUa14D[0].price;
                 const uaFarm14Message = `
-\n*--- Мощный ручной фарм 14 дней ---*
-\n**Описание:**
-\n- Кинг/мамка/соц аккаунт полностью готов к использованию.
-\n- Регистрация и все действия производились на украинском IP.
-\n**Дополнительно:**
-\n- Женский пол
-\n- Имена аккаунтов на кириллице
-\n- Друзья 20-100
-\n- Нагулянные cookies (2000+)
-\n- 15+ рекламных интересов
-\n- Уникальные 8+ фото в профиле и ленте
-\n- 20+ постов/репостов
-\n- 2 адекватно и полностью заполненные Fan Page + 3 поста
-\n- Возраст 20-35
-\n- Привязана почта
-\n- Паспорт с вероятностью прохождения ЗРД 70%
-\n- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
-\n- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
-\n- Включен проф. режим
-\n- Установлена 2ФА
-\n- Пройден чек по "селфи"
-\n**В комплекте:**
-\n- Логин/пароль аккаунта ФБ + почта
-\n- Дата рождения
-\n- ID аккаунта
-\n- Cookies .JSON
-\n- USERAGENT
-\n- Селфи и паспорт для прохождения ЗРД
-\n**ЦЕНА:** ${farmUa14DPrice}
-\n**ОСТАТОК:** ${farmUa14D.length - 1 || 0}
+*--- Мощный ручной фарм 14 дней ---*
+
+**Описание:**
+- Кинг/мамка/соц аккаунт полностью готов к использованию.
+- Регистрация и все действия производились на украинском IP.
+
+**Дополнительно:**
+- Женский пол
+- Имена аккаунтов на кириллице
+- Друзья 20-100
+- Нагулянные cookies (2000+)
+- 15+ рекламных интересов
+- Уникальные 8+ фото в профиле и ленте
+- 20+ постов/репостов
+- 2 адекватно и полностью заполненные Fan Page + 3 поста
+- Возраст 20-35
+- Привязана почта
+- Паспорт с вероятностью прохождения ЗРД 70%
+- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
+- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
+- Включен проф. режим
+- Установлена 2ФА
+- Пройден чек по "селфи"
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- Селфи и паспорт для прохождения ЗРД
+
+**ЦЕНА:** ${farmUa14DPrice}$
+**ОСТАТОК:** ${farmUa14D.length - 1 || 0}
             `;
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2367,36 +2382,40 @@ bot.on('callback_query', async (callbackQuery) => {
             if (farmUa30D.length > 0) {
                 const farmUa30DPrice = farmUa30D[0].price;
                 const uaFarm30Message = `
-\n*--- Мощный ручной фарм 30 дней ---*
-\n**Описание:**
-\n- Кинг/мамка/соц аккаунт полностью готов к использованию.
-\n- Регистрация и все действия производились на украинском IP.
-\n**Дополнительно:**
-\n- Женский пол
-\n- Имена аккаунтов на кириллице
-\n- Друзья 20-100
-\n- Нагулянные cookies (2000+)
-\n- 15+ рекламных интересов
-\n- Уникальные 8+ фото в профиле и ленте
-\n- 20+ постов/репостов
-\n- 2 адекватно и полностью заполненные Fan Page + 3 поста
-\n- Возраст 20-35
-\n- Привязана почта
-\n- Паспорт с вероятностью прохождения ЗРД 70%
-\n- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
-\n- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
-\n- Включен проф. режим
-\n- Установлена 2ФА
-\n- Пройден чек по "селфи"
-\n**В комплекте:**
-\n- Логин/пароль аккаунта ФБ + почта
-\n- Дата рождения
-\n- ID аккаунта
-\n- Cookies .JSON
-\n- USERAGENT
-\n- Селфи и паспорт для прохождения ЗРД
-\n**ЦЕНА:** ${farmUa30DPrice}
-\n**ОСТАТОК:** ${farmUa30D.length - 1 || 0}
+*--- Мощный ручной фарм 30 дней ---*
+
+**Описание:**
+- Кинг/мамка/соц аккаунт полностью готов к использованию.
+- Регистрация и все действия производились на украинском IP.
+
+**Дополнительно:**
+- Женский пол
+- Имена аккаунтов на кириллице
+- Друзья 20-100
+- Нагулянные cookies (2000+)
+- 15+ рекламных интересов
+- Уникальные 8+ фото в профиле и ленте
+- 20+ постов/репостов
+- 2 адекватно и полностью заполненные Fan Page + 3 поста
+- Возраст 20-35
+- Привязана почта
+- Паспорт с вероятностью прохождения ЗРД 70%
+- Внутренний фарм (переписки, лайки, игры, комментарии, видео, посты)
+- Внешний фарм (логин на сайтах, репосты, просмотр ютуб)
+- Включен проф. режим
+- Установлена 2ФА
+- Пройден чек по "селфи"
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- Селфи и паспорт для прохождения ЗРД
+
+**ЦЕНА:** ${farmUa30DPrice}$
+**ОСТАТОК:** ${farmUa30D.length - 1 || 0}
             `;
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2426,23 +2445,27 @@ bot.on('callback_query', async (callbackQuery) => {
             if (autoRegs.length > 0) {
                 const firstAutoRegPrice = autoRegs[0].price;
                 const autoRegUaFpMessage = `
-                        \n*--- Авторег UA + FP ---*
-                        \n**Описание:**
-                        \nСтабильные автореги, подходящие для любых задач - автозалив, ручной залив, линковка к кингу, дофарм и создание крепкого кинга и т.д. Аккаунты UA, готовы для рекламы.
-                        \n**Дополнительно:**
-                        \n- Установлена аватарка
-                        \n- Заполнен город/работа и т.д.
-                        \n- Имена и фамилии на украинском языке
-                        \n- Пол - женский
-                        \n**В комплекте:**
-                        \n- Логин/пароль аккаунта ФБ + почта
-                        \n- Дата рождения
-                        \n- ID аккаунта
-                        \n- Cookies .JSON
-                        \n- USERAGENT
-                        \n- EAAB-токен в комплекте.
-                        \n**ЦЕНА:** ${firstAutoRegPrice}
-                        \n**ОСТАТОК:** ${autoRegs.length - 1 || 0}
+*--- Авторег UA + FP ---*
+
+**Описание:**
+Стабильные автореги, подходящие для любых задач - автозалив, ручной залив, линковка к кингу, дофарм и создание крепкого кинга и т.д. Аккаунты UA, готовы для рекламы.
+
+**Дополнительно:**
+- Установлена аватарка
+- Заполнен город/работа и т.д.
+- Имена и фамилии на украинском языке
+- Пол - женский
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- EAAB-токен в комплекте.
+
+**ЦЕНА:** ${firstAutoRegPrice}$
+**ОСТАТОК:** ${autoRegs.length - 1 || 0}
                     `;
 
                 const confirmPurchaseKeyboard = {
@@ -2472,13 +2495,15 @@ bot.on('callback_query', async (callbackQuery) => {
             if (instaBm.length > 0) {
                 const instaBmPrice = instaBm[0].price;
                 const instaBmMessage = `
-\n*--- Insta BM ---*
-\n**Описание:**
-\nБизнес менеджер Facebook (БМ ФБ) Лимит 50$ Без РК и ФП.
-\nВ комплекте идёт ссылка для приёма бизнес менеджера.
-\nСрок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${instaBmPrice}
-\n**ОСТАТОК:**  ${instaBm.length - 1 || 0}
+*--- Insta BM ---*
+
+**Описание:**
+Бизнес менеджер Facebook (БМ ФБ) Лимит 50$ Без РК и ФП.
+В комплекте идёт ссылка для приёма бизнес менеджера.
+Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${instaBmPrice}$
+**ОСТАТОК:**  ${instaBm.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2507,13 +2532,15 @@ bot.on('callback_query', async (callbackQuery) => {
             if (instaBmFp.length > 0) {
                 const instaBmFpPrice = instaBmFp[0].price;
                 const instaBmFpMessage = `
-\n*--- Insta BM & FP ---*
-\n**Описание:**
-\nБизнес менеджер Facebook (БМ ФБ) Лимит 50$ Без ФП.
-\nВ комплекте идёт ссылка для приёма бизнес менеджера.
-\nСрок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${instaBmFpPrice}
-\n**ОСТАТОК:**  ${instaBmFp.length - 1 || 0}
+*--- Insta BM & FP ---*
+
+**Описание:**
+Бизнес менеджер Facebook (БМ ФБ) Лимит 50$ Без ФП.
+В комплекте идёт ссылка для приёма бизнес менеджера.
+Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${instaBmFpPrice}$
+**ОСТАТОК:**  ${instaBmFp.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2542,13 +2569,15 @@ bot.on('callback_query', async (callbackQuery) => {
             if (instaBmFpRk.length > 0) {
                 const instaBmFpRkPrice = instaBmFpRk[0].price;
                 const instaBmFpRkMessage = `
-\n*--- Insta BM & FP & PK ---*
-\n**Описание:**
-\nБизнес менеджер Facebook (БМ ФБ) Лимит 50$.
-\nВ комплекте идёт ссылка для приёма бизнес менеджера.
-\nСрок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${instaBmFpRkPrice}
-\n**ОСТАТОК:**  ${instaBmFpRk.length - 1 || 0}
+*--- Insta BM & FP & PK ---*
+
+**Описание:**
+Бизнес менеджер Facebook (БМ ФБ) Лимит 50$.
+В комплекте идёт ссылка для приёма бизнес менеджера.
+Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${instaBmFpRkPrice}$
+**ОСТАТОК:**  ${instaBmFpRk.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2577,11 +2606,13 @@ bot.on('callback_query', async (callbackQuery) => {
             if (pbPrivat.length > 0) {
                 const pbPrivatPrice = pbPrivat[0].price;
                 const pbPrivatMessage = `
-\n*--- Приват bin ---*
-\n**Описание:**
-\nКарта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${pbPrivatPrice}
-\n**ОСТАТОК:**  ${pbPrivat.length - 1 || 0}
+*--- Приват bin ---*
+
+**Описание:**
+Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${pbPrivatPrice}$
+**ОСТАТОК:**  ${pbPrivat.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2610,11 +2641,13 @@ bot.on('callback_query', async (callbackQuery) => {
             if (pbMono.length > 0) {
                 const pbMonoPrice = pbMono[0].price;
                 const pbMonoMessage = `
-\n*--- Моно bin ---*
-\n**Описание:**
-\nКарта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${pbMonoPrice}
-\n**ОСТАТОК:**  ${pbMono.length - 1 || 0}
+*--- Моно bin ---*
+
+**Описание:**
+Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${pbMonoPrice}$
+**ОСТАТОК:**  ${pbMono.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2643,11 +2676,13 @@ bot.on('callback_query', async (callbackQuery) => {
             if (pbAbank.length > 0) {
                 const pbAbankPrice = pbAbank[0].price;
                 const pbAbankMessage = `
-\n*--- А-банк bin ---*
-\n**Описание:**
-\nКарта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${pbAbankPrice}
-\n**ОСТАТОК:**  ${pbAbank.length - 1 || 0}
+*--- А-банк bin ---*
+
+**Описание:**
+Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${pbAbankPrice}$
+**ОСТАТОК:**  ${pbAbank.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2676,11 +2711,13 @@ bot.on('callback_query', async (callbackQuery) => {
             if (pbSens.length > 0) {
                 const pbSensPrice = pbSens[0].price;
                 const pbSensMessage = `
-\n*--- Сенс bin ---*
-\n**Описание:**
-\nКарта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
-\n**ЦЕНА:** ${pbSensPrice}
-\n**ОСТАТОК:**  ${pbSens.length - 1 || 0}
+*--- Сенс bin ---*
+
+**Описание:**
+Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
+
+**ЦЕНА:** ${pbSensPrice}$
+**ОСТАТОК:**  ${pbSens.length - 1 || 0}
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2709,15 +2746,18 @@ bot.on('callback_query', async (callbackQuery) => {
             if (proxyVodafone.length > 0) {
                 const proxyVodafonePrice = proxyVodafone[0].price;
                 const proxyVodafoneMessage = `
-\n*--- Proxy 30 дней ---*
-\n**Описание:**
-\n- Socks5/HTTP одновременно работающие протоколы
-\n- Смена IP по ссылке
-\n- 1 прокси = 1 руки
-\n**В комплекте:**
-\nIP/Port/Log/Pass + информация
-\n**ЦЕНА:** ${proxyVodafonePrice}
-\n**ОСТАТОК:**  ${proxyVodafone.length - 1 || 0}
+*--- Proxy 30 дней ---*
+
+**Описание:**
+- Socks5/HTTP одновременно работающие протоколы
+- Смена IP по ссылке
+- 1 прокси = 1 руки
+
+**В комплекте:**
+IP/Port/Log/Pass + информация
+
+**ЦЕНА:** ${proxyVodafonePrice}$
+**Для получения связатся с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2746,15 +2786,18 @@ bot.on('callback_query', async (callbackQuery) => {
             if (proxyLife.length > 0) {
                 const proxyLifePrice = proxyLife[0].price;
                 const proxyLifeMessage = `
-\n*--- Proxy 30 дней ---*
-\n**Описание:**
-\n- Socks5/HTTP одновременно работающие протоколы
-\n- Смена IP по ссылке
-\n- 1 прокси = 1 руки
-\n**В комплекте:**
-\nIP/Port/Log/Pass + информация
-\n**ЦЕНА:** ${proxyLifePrice}
-\n**ОСТАТОК:**  ${proxyLife.length - 1 || 0}
+*--- Proxy 30 дней ---*
+
+**Описание:**
+- Socks5/HTTP одновременно работающие протоколы
+- Смена IP по ссылке
+- 1 прокси = 1 руки
+
+**В комплекте:**
+IP/Port/Log/Pass + информация
+
+**ЦЕНА:** ${proxyLifePrice}$
+**Для получения связатся с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2783,15 +2826,18 @@ bot.on('callback_query', async (callbackQuery) => {
             if (proxyKyivstar.length > 0) {
                 const proxyKyivstarPrice = proxyKyivstar[0].price;
                 const proxyKyivstarMessage = `
-\n*--- Proxy 30 дней ---*
-\n**Описание:**
-\n- Socks5/HTTP одновременно работающие протоколы
-\n- Смена IP по ссылке
-\n- 1 прокси = 1 руки
-\n**В комплекте:**
-\nIP/Port/Log/Pass + информация
-\n**ЦЕНА:** ${proxyKyivstarPrice}
-\n**ОСТАТОК:**  ${proxyKyivstar.length - 1 || 0}
+*--- Proxy 30 дней ---*
+
+**Описание:**
+- Socks5/HTTP одновременно работающие протоколы
+- Смена IP по ссылке
+- 1 прокси = 1 руки
+
+**В комплекте:**
+IP/Port/Log/Pass + информация
+
+**ЦЕНА:** ${proxyKyivstarPrice}$
+**Для получения связатся с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -3290,7 +3336,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-
 
         default:
             // Обработка других действий
