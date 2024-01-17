@@ -1571,6 +1571,24 @@ async function getAvailableProxyKyivstar() {
         });
     });
 }
+async function sendAutoRegLinks(userId, quantity) {
+    try {
+        const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+
+        if (autoRegs.length > 0) {
+            for (let i = 0; i < quantity; i++) {
+                const autoReg = autoRegs[i];
+                // Отправляем ссылку на каждый авторег
+                await bot.sendMessage(userId, `Ваш товар: ${autoReg.link}`);
+            }
+        } else {
+            console.error('Ошибка при получении информации об автореге.');
+        }
+    } catch (error) {
+        console.error('Произошла ошибка при отправке авторегов:', error);
+        throw error;
+    }
+}
 // 
 bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
@@ -2598,14 +2616,8 @@ bot.on('callback_query', async (callbackQuery) => {
 **ОСТАТОК:** ${autoRegs.length - 1 || 0}
                     `;
 
-                const quantityButtons = Array.from({ length: Math.min(9, autoRegs.length - 1) }, (_, index) => ({
-                    text: `${(index + 1).toString()}шт`,
-                    callback_data: `quantity_${index + 1}`
-                }));
-
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        quantityButtons,
                         [{ text: 'Подтвердить покупку', callback_data: 'confirm_purchase' }],
                         [{ text: 'Вернуться назад', callback_data: 'auto_reg_ua' }],
                     ],
@@ -2620,11 +2632,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 // Обработка ошибки, если не удалось получить информацию об автореге
                 console.error('Ошибка при получении информации об автореге.');
             }
-            break;
-        case /^quantity_\d+$/:
-            const selectedQuantity = parseInt(query.data.split('_')[1]);
-            // Опционально, вы можете отправить сообщение, подтверждающее выбор количества
-            await bot.sendMessage(chatId, `Выбрано товаров: ${selectedQuantity}`);
             break;
         case 'insta_bm_info':
             const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
@@ -2894,7 +2901,7 @@ bot.on('callback_query', async (callbackQuery) => {
 IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyVodafonePrice}$
-**Для получения связатся с саппортом @r0yal13**
+**После оплаты свяжитесь с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2934,7 +2941,7 @@ IP/Port/Log/Pass + информация
 IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyLifePrice}$
-**Для получения связатся с саппортом @r0yal13**
+**После оплаты свяжитесь с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -2974,7 +2981,7 @@ IP/Port/Log/Pass + информация
 IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyKyivstarPrice}$
-**Для получения связатся с саппортом @r0yal13**
+**После оплаты свяжитесь с саппортом @r0yal13**
             `; const confirmPurchaseKeyboard = {
                     inline_keyboard: [
                         [
@@ -3017,11 +3024,11 @@ IP/Port/Log/Pass + информация
                     await removeAutoReg(autoReg.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${autoReg.link}`;
-                    await bot.sendMessage(chatId, successMessage);
+                    await sendAutoRegLinks(userId, 1);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                    const updatedAutoReg = await getAvailableAutoRegs(userId);
+                    const updatedAutoReg = await getAvailableAutoRegs();
+                    
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
                     console.error('Ошибка при получении информации об автореге.');
