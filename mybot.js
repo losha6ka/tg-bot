@@ -2996,6 +2996,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'vodafone_info':
             const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+            const proxyPrice = proxyVodafone.length || 40
 
             if (proxyVodafone.length > 0) {
                 const proxyVodafonePrice = proxyVodafone[0].price;
@@ -3046,6 +3047,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'life_info':
             const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+            const proxyPrice = proxyLife.length || 40
 
             if (proxyLife.length > 0) {
                 const proxyLifePrice = proxyLife[0].price;
@@ -3096,6 +3098,7 @@ IP/Port/Log/Pass + информация
             break;
         case 'kyivstar_info':
             const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+            const proxyPrice = proxyVodafone.length || 40
 
             if (proxyKyivstar.length > 0) {
                 const proxyKyivstarPrice = proxyKyivstar[0].price;
@@ -6886,18 +6889,19 @@ IP/Port/Log/Pass + информация
         case 'confirm_vodafone_1':
             try {
                 const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                const proxyPrice = proxyVodafone.length || 40
                 if (proxyVodafone && proxyVodafone.length > 0) {
                     const proxyVodafones = proxyVodafone[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyVodafones.price) {
+                    if (user.balance < proxyPrice) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyVodafones.price);
+                    await deductBalance(userId, proxyPrice);
 
                     // Удаляем авторег из базы данных
                     await removeProxyVodafone(proxyVodafones.id);
@@ -6923,18 +6927,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -6961,18 +6966,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -6999,18 +7005,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7037,18 +7044,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7075,18 +7083,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7113,18 +7122,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7151,18 +7161,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7189,18 +7200,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyVodafone && proxyVodafone.length > 0) {
                         const proxyVodafones = proxyVodafone[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyVodafones.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyVodafones.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyVodafone(proxyVodafones.id);
@@ -7226,18 +7238,19 @@ IP/Port/Log/Pass + информация
         case 'confirm_life_1':
             try {
                 const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                const proxyPrice = proxyLife.length || 40
                 if (proxyLife && proxyLife.length > 0) {
                     const proxyLifes = proxyLife[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyLifes.price) {
+                    if (user.balance < proxyPrice) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyLifes.price);
+                    await deductBalance(userId, proxyPrice);
 
                     // Удаляем авторег из базы данных
                     await removeProxyLife(proxyLifes.id);
@@ -7263,18 +7276,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7301,18 +7315,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7339,18 +7354,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7377,18 +7393,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7415,18 +7432,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7453,18 +7471,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7491,18 +7510,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7529,18 +7549,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyLife.length || 40
                     if (proxyLife && proxyLife.length > 0) {
                         const proxyLifes = proxyLife[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyLifes.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyLifes.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyLife(proxyLifes.id);
@@ -7566,18 +7587,19 @@ IP/Port/Log/Pass + информация
         case 'confirm_kyivstar_1':
             try {
                 const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                const proxyPrice = proxyVodafone.length || 40
                 if (proxyKyivstar && proxyKyivstar.length > 0) {
                     const proxyKyivstars = proxyKyivstar[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyKyivstars.price) {
+                    if (user.balance < proxyPrice) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyKyivstars.price);
+                    await deductBalance(userId, proxyPrice);
 
                     // Удаляем авторег из базы данных
                     await removeProxyKyivstar(proxyKyivstars.id);
@@ -7603,18 +7625,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7641,18 +7664,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7679,18 +7703,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7717,18 +7742,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7755,18 +7781,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7793,18 +7820,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7831,18 +7859,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
@@ -7869,18 +7898,19 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPrice = proxyVodafone.length || 40
                     if (proxyKyivstar && proxyKyivstar.length > 0) {
                         const proxyKyivstars = proxyKyivstar[0];
 
                         // Проверяем, достаточно ли средств на балансе
                         const user = await getUserById(userId);
-                        if (user.balance < proxyKyivstars.price) {
+                        if (user.balance < proxyPrice) {
                             await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                             return;
                         }
 
                         // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyKyivstars.price);
+                        await deductBalance(userId, proxyPrice);
 
                         // Удаляем авторег из базы данных
                         await removeProxyKyivstar(proxyKyivstars.id);
