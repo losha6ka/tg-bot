@@ -2996,7 +2996,6 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'vodafone_info':
             const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-            const proxyPrice = proxyVodafone.length || 40
 
             if (proxyVodafone.length > 0) {
                 const proxyVodafonePrice = proxyVodafone[0].price;
@@ -3011,7 +3010,7 @@ bot.on('callback_query', async (callbackQuery) => {
 **В комплекте:**
 IP/Port/Log/Pass + информация
 
-**ЦЕНА:** ${proxyVodafonePrice}$
+**ЦЕНА:** ${proxyVodafonePrice || 40}$
 **После оплаты свяжитесь с саппортом @r0yal13**
             `;
                 const buttonsToShow = proxyVodafone.slice(0, 9).map((_, index) => {
@@ -3047,7 +3046,6 @@ IP/Port/Log/Pass + информация
             break;
         case 'life_info':
             const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-            const proxyPrice = proxyLife.length || 40
 
             if (proxyLife.length > 0) {
                 const proxyLifePrice = proxyLife[0].price;
@@ -3062,7 +3060,7 @@ IP/Port/Log/Pass + информация
 **В комплекте:**
 IP/Port/Log/Pass + информация
 
-**ЦЕНА:** ${proxyLifePrice}$
+**ЦЕНА:** ${proxyLifePrice || 40}$
 **После оплаты свяжитесь с саппортом @r0yal13**
             `;
                 const buttonsToShow = proxyLife.slice(0, 9).map((_, index) => {
@@ -3098,7 +3096,6 @@ IP/Port/Log/Pass + информация
             break;
         case 'kyivstar_info':
             const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-            const proxyPrice = proxyVodafone.length || 40
 
             if (proxyKyivstar.length > 0) {
                 const proxyKyivstarPrice = proxyKyivstar[0].price;
@@ -3113,7 +3110,7 @@ IP/Port/Log/Pass + информация
 **В комплекте:**
 IP/Port/Log/Pass + информация
 
-**ЦЕНА:** ${proxyKyivstarPrice}$
+**ЦЕНА:** ${proxyKyivstarPrice || 40}$
 **После оплаты свяжитесь с саппортом @r0yal13**
             `;
                 const buttonsToShow = proxyKyivstar.slice(0, 9).map((_, index) => {
@@ -6889,19 +6886,52 @@ IP/Port/Log/Pass + информация
         case 'confirm_vodafone_1':
             try {
                 const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                const proxyPrice = proxyVodafone.length || 40
-                if (proxyVodafone && proxyVodafone.length > 0) {
+                const proxyPriceVodafone = proxyVodafone.length || 40
+
+                const proxyVodafones = proxyVodafone[0];
+
+                // Проверяем, достаточно ли средств на балансе
+                const user = await getUserById(userId);
+                if (user.balance < proxyPriceVodafone) {
+                    await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                    return;
+                }
+
+                // Списываем с баланса пользователя цену авторега
+                await deductBalance(userId, proxyPriceVodafone);
+
+                // Удаляем авторег из базы данных
+                await removeProxyVodafone(proxyVodafones.id);
+
+                // Отправляем пользователю сообщение об успешной покупке
+                const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                await bot.sendMessage(chatId, successMessage);
+
+                // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
+            } catch (error) {
+                console.error('Произошла ошибка при подтверждении покупки:', error);
+                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_vodafone_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    const proxyPriceVodafone = proxyVodafone.length || 40
+
                     const proxyVodafones = proxyVodafone[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyPrice) {
+                    if (user.balance < proxyPriceVodafone) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyPrice);
+                    await deductBalance(userId, proxyPriceVodafone);
 
                     // Удаляем авторег из базы данных
                     await removeProxyVodafone(proxyVodafones.id);
@@ -6912,50 +6942,7 @@ IP/Port/Log/Pass + информация
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                } else {
-                    // Обработка ошибки, если не удалось получить информацию об автореге
-                    await bot.sendMessage(chatId, 'Товара нет в наличии');
 
-                    console.error('Ошибка при получении информации об автореге.');
-                }
-            } catch (error) {
-                console.error('Произошла ошибка при подтверждении покупки:', error);
-                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
-            }
-            break;
-        case 'confirm_vodafone_2':
-            for (let i = 0; i < 2; i++) {
-                try {
-                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
-
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
-
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
-                    }
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -6966,35 +6953,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7005,35 +6987,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7044,35 +7021,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7083,35 +7055,31 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7122,35 +7090,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7161,35 +7124,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7200,35 +7158,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyVodafone && proxyVodafone.length > 0) {
-                        const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafone.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyVodafones = proxyVodafone[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyVodafone(proxyVodafones.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceVodafone) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceVodafone);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyVodafone(proxyVodafones.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7238,19 +7191,52 @@ IP/Port/Log/Pass + информация
         case 'confirm_life_1':
             try {
                 const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                const proxyPrice = proxyLife.length || 40
-                if (proxyLife && proxyLife.length > 0) {
+                const proxyPriceLife = proxyLife.length || 40
+
+                const proxyLifes = proxyLife[0];
+
+                // Проверяем, достаточно ли средств на балансе
+                const user = await getUserById(userId);
+                if (user.balance < proxyPriceLife) {
+                    await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                    return;
+                }
+
+                // Списываем с баланса пользователя цену авторега
+                await deductBalance(userId, proxyPriceLife);
+
+                // Удаляем авторег из базы данных
+                await removeProxyLife(proxyLifes.id);
+
+                // Отправляем пользователю сообщение об успешной покупке
+                const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                await bot.sendMessage(chatId, successMessage);
+
+                // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
+            } catch (error) {
+                console.error('Произошла ошибка при подтверждении покупки:', error);
+                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_life_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    const proxyPriceLife = proxyLife.length || 40
+
                     const proxyLifes = proxyLife[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyPrice) {
+                    if (user.balance < proxyPriceLife) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyPrice);
+                    await deductBalance(userId, proxyPriceLife);
 
                     // Удаляем авторег из базы данных
                     await removeProxyLife(proxyLifes.id);
@@ -7261,50 +7247,7 @@ IP/Port/Log/Pass + информация
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                } else {
-                    // Обработка ошибки, если не удалось получить информацию об автореге
-                    await bot.sendMessage(chatId, 'Товара нет в наличии');
 
-                    console.error('Ошибка при получении информации об автореге.');
-                }
-            } catch (error) {
-                console.error('Произошла ошибка при подтверждении покупки:', error);
-                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
-            }
-            break;
-        case 'confirm_life_2':
-            for (let i = 0; i < 2; i++) {
-                try {
-                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
-
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
-
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
-                    }
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7315,35 +7258,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7354,35 +7292,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7393,35 +7326,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7432,35 +7360,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7471,35 +7394,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7510,35 +7428,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7549,35 +7462,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyLife.length || 40
-                    if (proxyLife && proxyLife.length > 0) {
-                        const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLife.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyLifes = proxyLife[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyLife(proxyLifes.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceLife) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceLife);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyLife(proxyLifes.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyLife(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7587,19 +7495,52 @@ IP/Port/Log/Pass + информация
         case 'confirm_kyivstar_1':
             try {
                 const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                const proxyPrice = proxyVodafone.length || 40
-                if (proxyKyivstar && proxyKyivstar.length > 0) {
+                const proxyPriceKyivstar = proxyKyivstar.length || 40
+
+                const proxyKyivstars = proxyKyivstar[0];
+
+                // Проверяем, достаточно ли средств на балансе
+                const user = await getUserById(userId);
+                if (user.balance < proxyPriceKyivstar) {
+                    await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                    return;
+                }
+
+                // Списываем с баланса пользователя цену авторега
+                await deductBalance(userId, proxyPriceKyivstar);
+
+                // Удаляем авторег из базы данных
+                await removeProxyKyivstar(proxyKyivstars.id);
+
+                // Отправляем пользователю сообщение об успешной покупке
+                const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                await bot.sendMessage(chatId, successMessage);
+
+                // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
+            } catch (error) {
+                console.error('Произошла ошибка при подтверждении покупки:', error);
+                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_kyivstar_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
+
                     const proxyKyivstars = proxyKyivstar[0];
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
-                    if (user.balance < proxyPrice) {
+                    if (user.balance < proxyPriceKyivstar) {
                         await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
                         return;
                     }
 
                     // Списываем с баланса пользователя цену авторега
-                    await deductBalance(userId, proxyPrice);
+                    await deductBalance(userId, proxyPriceKyivstar);
 
                     // Удаляем авторег из базы данных
                     await removeProxyKyivstar(proxyKyivstars.id);
@@ -7610,50 +7551,7 @@ IP/Port/Log/Pass + информация
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                } else {
-                    // Обработка ошибки, если не удалось получить информацию об автореге
-                    await bot.sendMessage(chatId, 'Товара нет в наличии');
 
-                    console.error('Ошибка при получении информации об автореге.');
-                }
-            } catch (error) {
-                console.error('Произошла ошибка при подтверждении покупки:', error);
-                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
-            }
-            break;
-        case 'confirm_kyivstar_2':
-            for (let i = 0; i < 2; i++) {
-                try {
-                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
-
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
-
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
-                    }
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7664,35 +7562,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7703,35 +7596,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7742,35 +7630,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7781,35 +7664,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7820,35 +7698,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7859,35 +7732,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
@@ -7898,35 +7766,30 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPrice = proxyVodafone.length || 40
-                    if (proxyKyivstar && proxyKyivstar.length > 0) {
-                        const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstar.length || 40
 
-                        // Проверяем, достаточно ли средств на балансе
-                        const user = await getUserById(userId);
-                        if (user.balance < proxyPrice) {
-                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
-                            return;
-                        }
+                    const proxyKyivstars = proxyKyivstar[0];
 
-                        // Списываем с баланса пользователя цену авторега
-                        await deductBalance(userId, proxyPrice);
-
-                        // Удаляем авторег из базы данных
-                        await removeProxyKyivstar(proxyKyivstars.id);
-
-                        // Отправляем пользователю сообщение об успешной покупке
-                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
-                        await bot.sendMessage(chatId, successMessage);
-
-                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
-                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
-                    } else {
-                        // Обработка ошибки, если не удалось получить информацию об автореге
-                        await bot.sendMessage(chatId, 'Товара нет в наличии');
-
-                        console.error('Ошибка при получении информации об автореге.');
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < proxyPriceKyivstar) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
                     }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, proxyPriceKyivstar);
+
+                    // Удаляем авторег из базы данных
+                    await removeProxyKyivstar(proxyKyivstars.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                    await bot.sendMessage(chatId, successMessage);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+
                 } catch (error) {
                     console.error('Произошла ошибка при подтверждении покупки:', error);
                     await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
