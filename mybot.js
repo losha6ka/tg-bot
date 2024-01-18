@@ -2056,7 +2056,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `30 дней | ${price || 10}$`,
                             callback_data: `vodafone_info`
                         }]),
-                        ...(vodafone.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
+                        ...(vodafone.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'vodafone_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -2089,7 +2089,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `30 дней | ${price || 10}$`,
                             callback_data: `life_info`
                         }]),
-                        ...(life.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
+                        ...(life.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'life_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
@@ -2122,7 +2122,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `30 дней | ${price || 10}$`,
                             callback_data: `kyivstar_info`
                         }]),
-                        ...(kyivstar.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'none' }]] : []),
+                        ...(kyivstar.length === 0 ? [[{ text: '30 дней | 40$', callback_data: 'kyivstar_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'proxy' }],
                     ],
                 };
