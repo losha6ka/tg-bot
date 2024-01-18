@@ -1574,14 +1574,16 @@ async function getAvailableProxyKyivstar() {
 async function sendAutoRegLinks(userId, quantity) {
     try {
         const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
-
+        const balance = await getBalance(userId)
         if (autoRegs.length > 0) {
             for (let i = 0; i < quantity; i++) {
                 const autoReg = autoRegs[i];
                 // Отправляем ссылку на каждый авторег
-                await bot.sendMessage(userId, `Ваш товар: ${autoReg.link}`);
+                await bot.sendMessage(userId, `Ваш товар: ${autoReg.link}\nВаш баланс: ${balance}$`);
             }
         } else {
+            await bot.sendMessage(chatId, 'Товара нет в наличии');
+
             console.error('Ошибка при получении информации об автореге.');
         }
     } catch (error) {
@@ -2437,16 +2439,23 @@ bot.on('callback_query', async (callbackQuery) => {
 - Селфи и паспорт для прохождения ЗРД
 
 **ЦЕНА:** ${farmUa7DPrice}$
-**ОСТАТОК:** ${farmUa7D.length - 1 || 0}
+**ОСТАТОК:** ${farmUa7D.length || 0}
             `;
+                const buttonsToShow = farmUa7D.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_farm_ua_7d_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_farm_ua_7d`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2457,6 +2466,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2500,16 +2511,23 @@ bot.on('callback_query', async (callbackQuery) => {
 - Селфи и паспорт для прохождения ЗРД
 
 **ЦЕНА:** ${farmUa14DPrice}$
-**ОСТАТОК:** ${farmUa14D.length - 1 || 0}
+**ОСТАТОК:** ${farmUa14D.length || 0}
             `;
+                const buttonsToShow = farmUa14D.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_farm_ua_14d_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_farm_ua_14d`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2520,6 +2538,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2563,16 +2583,23 @@ bot.on('callback_query', async (callbackQuery) => {
 - Селфи и паспорт для прохождения ЗРД
 
 **ЦЕНА:** ${farmUa30DPrice}$
-**ОСТАТОК:** ${farmUa30D.length - 1 || 0}
+**ОСТАТОК:** ${farmUa30D.length || 0}
             `;
+                const buttonsToShow = farmUa30D.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_farm_ua_30d_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_farm_ua_30d`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2583,6 +2610,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2613,14 +2642,24 @@ bot.on('callback_query', async (callbackQuery) => {
 - EAAB-токен в комплекте.
 
 **ЦЕНА:** ${firstAutoRegPrice}$
-**ОСТАТОК:** ${autoRegs.length - 1 || 0}
+**ОСТАТОК:** ${autoRegs.length || 0}
                     `;
+                const buttonsToShow = autoRegs.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_purchase_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'auto_reg_ua' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [{ text: 'Подтвердить покупку', callback_data: 'confirm_purchase' }],
-                        [{ text: 'Вернуться назад', callback_data: 'auto_reg_ua' }],
-                    ],
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
+                    ]
                 };
 
                 // Отправляем сообщение с описанием и кнопкой подтверждения
@@ -2630,6 +2669,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
             break;
@@ -2647,15 +2688,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${instaBmPrice}$
-**ОСТАТОК:**  ${instaBm.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${instaBm.length || 0}
+            `;
+                const buttonsToShow = instaBm.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_insta_bm_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_insta_bm`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2666,6 +2715,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2684,15 +2735,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${instaBmFpPrice}$
-**ОСТАТОК:**  ${instaBmFp.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${instaBmFp.length || 0}
+            `;
+                const buttonsToShow = instaBmFp.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_insta_bm_fp_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm_fp' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_insta_bm_fp`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2703,6 +2762,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2721,15 +2782,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${instaBmFpRkPrice}$
-**ОСТАТОК:**  ${instaBmFpRk.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${instaBmFpRk.length || 0}
+            `;
+                const buttonsToShow = instaBmFpRk.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_insta_bm_fp_rk_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm_fp_rk' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_insta_bm_fp_rk`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2740,6 +2809,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2756,15 +2827,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${pbPrivatPrice}$
-**ОСТАТОК:**  ${pbPrivat.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${pbPrivat.length || 0}
+            `;
+                const buttonsToShow = pbPrivat.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_privat_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_privat' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_privat`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2775,6 +2854,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2791,15 +2872,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${pbMonoPrice}$
-**ОСТАТОК:**  ${pbMono.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${pbMono.length || 0}
+            `;
+                const buttonsToShow = pbMono.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_mono_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_monobank' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_mono`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2810,6 +2899,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2826,18 +2917,25 @@ bot.on('callback_query', async (callbackQuery) => {
 Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${pbAbankPrice}$
-**ОСТАТОК:**  ${pbAbank.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${pbAbank.length || 0}
+            `;
+                const buttonsToShow = pbAbank.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_abank_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_a_bank' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_abank`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
-
                 // Отправляем сообщение с описанием и кнопкой подтверждения
                 await bot.sendMessage(chatId, pbAbankMessage, {
                     parse_mode: 'Markdown',
@@ -2845,6 +2943,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2861,15 +2961,23 @@ bot.on('callback_query', async (callbackQuery) => {
 Карта для первобила, без баланса. В комплекте идёт номер карты, срок действия, свв. Срок действия с момента покупки 24 часа (!!!)
 
 **ЦЕНА:** ${pbSensPrice}$
-**ОСТАТОК:**  ${pbSens.length - 1 || 0}
-            `; const confirmPurchaseKeyboard = {
+**ОСТАТОК:**  ${pbSens.length || 0}
+            `;
+                const buttonsToShow = pbSens.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_sens_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_sens' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_sens`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2880,6 +2988,8 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2902,14 +3012,22 @@ IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyVodafonePrice}$
 **После оплаты свяжитесь с саппортом @r0yal13**
-            `; const confirmPurchaseKeyboard = {
+            `;
+                const buttonsToShow = proxyVodafone.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_vodafone_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_vodafone' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_vodafone`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2920,6 +3038,8 @@ IP/Port/Log/Pass + информация
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2942,14 +3062,22 @@ IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyLifePrice}$
 **После оплаты свяжитесь с саппортом @r0yal13**
-            `; const confirmPurchaseKeyboard = {
+            `;
+                const buttonsToShow = proxyLife.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_life_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_life' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_life`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -2960,6 +3088,8 @@ IP/Port/Log/Pass + информация
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
@@ -2982,14 +3112,22 @@ IP/Port/Log/Pass + информация
 
 **ЦЕНА:** ${proxyKyivstarPrice}$
 **После оплаты свяжитесь с саппортом @r0yal13**
-            `; const confirmPurchaseKeyboard = {
+            `;
+                const buttonsToShow = proxyKyivstar.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_kyivstar_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_kyivstar' });
+
+                const confirmPurchaseKeyboard = {
                     inline_keyboard: [
-                        [
-                            {
-                                text: 'Подтвердить покупку',
-                                callback_data: `confirm_kyivstar`
-                            }
-                        ]
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
                     ]
                 };
 
@@ -3000,11 +3138,13 @@ IP/Port/Log/Pass + информация
                 });
             } else {
                 // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                 console.error('Ошибка при получении информации об автореге.');
             }
 
             break;
-        case 'confirm_purchase':
+        case 'confirm_purchase_1':
             try {
                 const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
                 if (autoRegs && autoRegs.length > 0) {
@@ -3028,9 +3168,10 @@ IP/Port/Log/Pass + информация
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedAutoReg = await getAvailableAutoRegs();
-                    
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3038,7 +3179,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_farm_ua_7d':
+        case 'confirm_purchase_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_purchase_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                    if (autoRegs && autoRegs.length > 0) {
+                        const autoReg = autoRegs[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoReg.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoReg.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoReg(autoReg.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegs();
+
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_1':
             try {
                 const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
                 if (farmUa7D && farmUa7D.length > 0) {
@@ -3058,13 +3503,15 @@ IP/Port/Log/Pass + информация
                     await removeFarmUa7d(farmUa7d.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3072,7 +3519,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_farm_ua_14d':
+        case 'confirm_farm_ua_7d_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_7d_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const farmUa7D = await getAvailableFarmUa7D(); // Получаем доступные автореги для пользователя
+                    if (farmUa7D && farmUa7D.length > 0) {
+                        const farmUa7d = farmUa7D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa7d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa7d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa7d(farmUa7d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa7d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa7D = await getAvailableFarmUa7D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_1':
             try {
                 const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
                 if (farmUa14D && farmUa14D.length > 0) {
@@ -3092,13 +3843,15 @@ IP/Port/Log/Pass + информация
                     await removeFarmUa14d(farmUa14d.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3106,7 +3859,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_farm_ua_30d':
+        case 'confirm_farm_ua_14d_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_14d_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const farmUa14D = await getAvailableFarmUa14D(); // Получаем доступные автореги для пользователя
+                    if (farmUa14D && farmUa14D.length > 0) {
+                        const farmUa14d = farmUa14D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa14d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa14d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa14d(farmUa14d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa14d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa14D = await getAvailableFarmUa14D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_1':
             try {
                 const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
                 if (farmUa30D && farmUa30D.length > 0) {
@@ -3126,13 +4183,15 @@ IP/Port/Log/Pass + информация
                     await removeFarmUa30d(farmUa30d.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3140,7 +4199,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_insta_bm':
+        case 'confirm_farm_ua_30d_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_farm_ua_30d_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const farmUa30D = await getAvailableFarmUa30D(); // Получаем доступные автореги для пользователя
+                    if (farmUa30D && farmUa30D.length > 0) {
+                        const farmUa30d = farmUa30D[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < farmUa30d.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, farmUa30d.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeFarmUa30d(farmUa30d.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${farmUa30d.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableFarmUa30D(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_1':
             try {
                 const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
                 if (instaBm && instaBm.length > 0) {
@@ -3160,13 +4523,15 @@ IP/Port/Log/Pass + информация
                     await removeInstaBm(instaBM.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableInstaBm(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3174,7 +4539,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_insta_bm_fp':
+        case 'confirm_insta_bm_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const instaBm = await getAvailableInstaBm(); // Получаем доступные автореги для пользователя
+                    if (instaBm && instaBm.length > 0) {
+                        const instaBM = instaBm[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBM.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBM.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBm(instaBM.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBM.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBm(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_1':
             try {
                 const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
                 if (instaBmFp && instaBmFp.length > 0) {
@@ -3194,13 +4863,15 @@ IP/Port/Log/Pass + информация
                     await removeInstaBmFp(instaBMFP.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3208,7 +4879,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_insta_bm_fp_rk':
+        case 'confirm_insta_bm_fp_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_4':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const instaBmFp = await getAvailableInstaBmFp(); // Получаем доступные автореги для пользователя
+                    if (instaBmFp && instaBmFp.length > 0) {
+                        const instaBMFP = instaBmFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFP.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFP.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFp(instaBMFP.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFP.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFp(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_1':
             try {
                 const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                 if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -3228,13 +5203,15 @@ IP/Port/Log/Pass + информация
                     await removeInstaBmFpRk(instaBMFPRK.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3242,7 +5219,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_privat':
+        case 'confirm_insta_bm_fp_rk_2':
+            for (let i = 0; i > 2; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_3':
+            for (let i = 0; i > 3; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_4':
+            for (let i = 0; i > 4; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_5':
+            for (let i = 0; i > 5; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_6':
+            for (let i = 0; i > 6; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_7':
+            for (let i = 0; i > 7; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_8':
+            for (let i = 0; i > 8; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_insta_bm_fp_rk_9':
+            for (let i = 0; i > 9; i++) {
+                try {
+                    const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
+                    if (instaBmFpRk && instaBmFpRk.length > 0) {
+                        const instaBMFPRK = instaBmFpRk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < instaBMFPRK.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, instaBMFPRK.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeInstaBmFpRk(instaBMFPRK.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${instaBMFPRK.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableInstaBmFpRk(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_1':
             try {
                 const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
                 if (pbPrivat && pbPrivat.length > 0) {
@@ -3262,13 +5543,15 @@ IP/Port/Log/Pass + информация
                     await removePbPrivat(pbPrivats.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailablePbPrivat(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3276,7 +5559,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_mono':
+        case 'confirm_privat_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_privat_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const pbPrivat = await getAvailablePbPrivat(); // Получаем доступные автореги для пользователя
+                    if (pbPrivat && pbPrivat.length > 0) {
+                        const pbPrivats = pbPrivat[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbPrivats.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbPrivats.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbPrivat(pbPrivats.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbPrivats.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbPrivat(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_1':
             try {
                 const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
                 if (pbMono && pbMono.length > 0) {
@@ -3296,13 +5883,15 @@ IP/Port/Log/Pass + информация
                     await removePbMono(pbMonos.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailablePbMono(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3310,7 +5899,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_abank':
+        case 'confirm_mono_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_mono_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const pbMono = await getAvailablePbMono(); // Получаем доступные автореги для пользователя
+                    if (pbMono && pbMono.length > 0) {
+                        const pbMonos = pbMono[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbMonos.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbMonos.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbMono(pbMonos.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbMonos.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbMono(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_1':
             try {
                 const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
                 if (pbAbank && pbAbank.length > 0) {
@@ -3330,13 +6223,15 @@ IP/Port/Log/Pass + информация
                     await removePbAbank(pbAbanks.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailablePbAbank(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3344,7 +6239,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_sens':
+        case 'confirm_abank_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_abank_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const pbAbank = await getAvailablePbAbank(); // Получаем доступные автореги для пользователя
+                    if (pbAbank && pbAbank.length > 0) {
+                        const pbAbanks = pbAbank[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbAbanks.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbAbanks.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbAbank(pbAbanks.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbAbanks.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbAbank(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_1':
             try {
                 const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
                 if (pbSens && pbSens.length > 0) {
@@ -3364,13 +6563,15 @@ IP/Port/Log/Pass + информация
                     await removePbSens(pbSenss.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}`;
+                    const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailablePbSens(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3378,7 +6579,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_vodafone':
+        case 'confirm_sens_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_sens_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const pbSens = await getAvailablePbSens(); // Получаем доступные автореги для пользователя
+                    if (pbSens && pbSens.length > 0) {
+                        const pbSenss = pbSens[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < pbSenss.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, pbSenss.price);
+
+                        // Удаляем авторег из базы данных
+                        await removePbSens(pbSenss.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Ссылка: ${pbSenss.link}\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailablePbSens(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_1':
             try {
                 const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
                 if (proxyVodafone && proxyVodafone.length > 0) {
@@ -3398,13 +6903,15 @@ IP/Port/Log/Pass + информация
                     await removeProxyVodafone(proxyVodafones.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3412,7 +6919,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_life':
+        case 'confirm_vodafone_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_vodafone_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
+                    if (proxyVodafone && proxyVodafone.length > 0) {
+                        const proxyVodafones = proxyVodafone[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyVodafones.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyVodafones.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyVodafone(proxyVodafones.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyVodafone(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_1':
             try {
                 const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
                 if (proxyLife && proxyLife.length > 0) {
@@ -3432,13 +7243,15 @@ IP/Port/Log/Pass + информация
                     await removeProxyLife(proxyLifes.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyLife(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
@@ -3446,7 +7259,311 @@ IP/Port/Log/Pass + информация
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
             break;
-        case 'confirm_kyivstar':
+        case 'confirm_life_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_life_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
+                    if (proxyLife && proxyLife.length > 0) {
+                        const proxyLifes = proxyLife[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyLifes.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyLifes.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyLife(proxyLifes.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyLife(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_1':
             try {
                 const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
                 if (proxyKyivstar && proxyKyivstar.length > 0) {
@@ -3466,18 +7583,324 @@ IP/Port/Log/Pass + информация
                     await removeProxyKyivstar(proxyKyivstars.id);
 
                     // Отправляем пользователю сообщение об успешной покупке
-                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13`;
+                    const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
                     await bot.sendMessage(chatId, successMessage);
 
                     // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                     const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
                 } else {
                     // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
                     console.error('Ошибка при получении информации об автореге.');
                 }
             } catch (error) {
                 console.error('Произошла ошибка при подтверждении покупки:', error);
                 await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_kyivstar_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_kyivstar_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
+                    if (proxyKyivstar && proxyKyivstar.length > 0) {
+                        const proxyKyivstars = proxyKyivstar[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < proxyKyivstars.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, proxyKyivstars.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeProxyKyivstar(proxyKyivstars.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        const successMessage = `Вы успешно приобрели товар! Отправьте этот скриншот саппорту @r0yal13\nВаш баланс: ${await getBalance(userId)}$`;
+                        await bot.sendMessage(chatId, successMessage);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedFarmUa30D = await getAvailableProxyKyivstar(userId);
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
             }
             break;
 
