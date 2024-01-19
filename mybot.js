@@ -6908,10 +6908,10 @@ IP/Port/Log/Pass + информация
         case 'confirm_vodafone_1':
             try {
                 const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                const proxyPriceVodafone = proxyVodafone.length || 40
-
                 const proxyVodafones = proxyVodafone[0];
+                const proxyPriceVodafone = proxyVodafones.price || 40
 
+                console.log(proxyPriceVodafone)
                 // Проверяем, достаточно ли средств на балансе
                 const user = await getUserById(userId);
                 if (user.balance < proxyPriceVodafone) {
@@ -6941,9 +6941,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -6975,9 +6974,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7009,9 +7007,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7043,9 +7041,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7077,9 +7075,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7112,9 +7110,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7146,9 +7144,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7180,9 +7178,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyVodafone = await getAvailableProxyVodafone(); // Получаем доступные автореги для пользователя
-                    const proxyPriceVodafone = proxyVodafone.length || 40
-
                     const proxyVodafones = proxyVodafone[0];
+                    const proxyPriceVodafone = proxyVodafones.price || 40
+
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7213,9 +7211,9 @@ IP/Port/Log/Pass + информация
         case 'confirm_life_1':
             try {
                 const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                const proxyPriceLife = proxyLife.length || 40
 
                 const proxyLifes = proxyLife[0];
+                const proxyPriceLife = proxyLifes.price || 40
 
                 // Проверяем, достаточно ли средств на балансе
                 const user = await getUserById(userId);
@@ -7246,9 +7244,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7280,9 +7278,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7314,9 +7312,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7348,9 +7346,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7382,9 +7380,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7416,9 +7414,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7450,9 +7448,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7484,9 +7482,9 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyLife = await getAvailableProxyLife(); // Получаем доступные автореги для пользователя
-                    const proxyPriceLife = proxyLife.length || 40
 
                     const proxyLifes = proxyLife[0];
+                    const proxyPriceLife = proxyLifes.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7517,9 +7515,8 @@ IP/Port/Log/Pass + информация
         case 'confirm_kyivstar_1':
             try {
                 const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                 const proxyKyivstars = proxyKyivstar[0];
+                const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                 // Проверяем, достаточно ли средств на балансе
                 const user = await getUserById(userId);
@@ -7550,9 +7547,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 2; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7584,9 +7580,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 3; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7618,9 +7613,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 4; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7652,9 +7646,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 5; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7686,9 +7679,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 6; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7720,9 +7712,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 7; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7754,9 +7745,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 8; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
@@ -7788,9 +7778,8 @@ IP/Port/Log/Pass + информация
             for (let i = 0; i < 9; i++) {
                 try {
                     const proxyKyivstar = await getAvailableProxyKyivstar(); // Получаем доступные автореги для пользователя
-                    const proxyPriceKyivstar = proxyKyivstar.length || 40
-
                     const proxyKyivstars = proxyKyivstar[0];
+                    const proxyPriceKyivstar = proxyKyivstars.price || 40
 
                     // Проверяем, достаточно ли средств на балансе
                     const user = await getUserById(userId);
