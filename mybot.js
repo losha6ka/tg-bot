@@ -1600,6 +1600,7 @@ bot.on('callback_query', async (callbackQuery) => {
     const currentState = userStates[chatId];
     const action = callbackQuery.data;
     const userId = callbackQuery.from.id;
+    const userLogin = callbackQuery.from.username ? `@${callbackQuery.from.username}` : '@blank';
 
     switch (action) {
         case 'my_profile':
@@ -2322,8 +2323,10 @@ bot.on('callback_query', async (callbackQuery) => {
                             if (photoInfo && photoInfo.file_id) {
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedBinance = true;
+                                const userIdToCopyBinance = `<code>👆${userId}</code>`
                                 for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: Binance` });
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nНик: ${userLogin}\nЧерез: Binance` });
+                                    await bot.sendMessage(adminUserId, userIdToCopyBinance, { parse_mode: 'HTML' });
                                 }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
@@ -2360,8 +2363,11 @@ bot.on('callback_query', async (callbackQuery) => {
                             if (photoInfo && photoInfo.file_id) {
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedCrypto = true;
+                                const userIdToCopyCrypto = `<code>👆${userId}</code>`
                                 for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: Crypto` });
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nНик: ${userLogin}\nЧерез: Crypto` });
+                                    await bot.sendMessage(adminUserId, userIdToCopyCrypto, { parse_mode: 'HTML' });
+
                                 }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
@@ -2398,8 +2404,10 @@ bot.on('callback_query', async (callbackQuery) => {
                             if (photoInfo && photoInfo.file_id) {
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedUaCard = true;
+                                const userIdToCopyUaCard = `<code>👆${userId}</code>`
                                 for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: UA Card` });
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nНик: ${userLogin}\nЧерез: UA Card` });
+                                    await bot.sendMessage(chatId, userIdToCopyUaCard, { parse_mode: 'HTML' });
                                 }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
