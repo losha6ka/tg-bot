@@ -181,8 +181,8 @@ bot.onText(/\/help/, async (msg) => {
     if (adminUserIds.includes(userId)) {
         const commands = `
 \nПополнить счёт пользователя - /add_funds 
-\nДобавить авторег -  /add_auto_reg
 \nДобавить пост -  /add_post
+\nДобавить авторег -  /add_auto_reg
 \nДобавить Farm UA 7дней - /add_farm_ua_7d
 \nДобавить Farm UA 14дней - /add_farm_ua_14d
 \nДобавить Farm UA 30дней - /add_farm_ua_30d
@@ -2313,7 +2313,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!isNaN(enteredAmount)) {
                     const fundsBinanceText = `Вы можете произвести оплату ${enteredAmount}$ по Binance\n${copyBinance}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsBinanceText, { parse_mode: 'HTML' });
-                    numberReceived = true
                     // Ожидание фото
                     while (!photoReceivedBinance) {
                         try {
@@ -2321,11 +2320,11 @@ bot.on('callback_query', async (callbackQuery) => {
                             const photoInfo = photo.photo[0];
 
                             if (photoInfo && photoInfo.file_id) {
-                                for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: Binance` });
-                                }
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedBinance = true;
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: Binance` });
+                                }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
                                 await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
@@ -2352,7 +2351,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!isNaN(enteredAmount)) {
                     const fundsCryptoText = `Вы можете произвести оплату ${enteredAmount}$ по Crypto\n${copyBinance}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsCryptoText, { parse_mode: 'HTML' });
-                    numberReceived = true
                     // Ожидание фото
                     while (!photoReceivedCrypto) {
                         try {
@@ -2360,11 +2358,11 @@ bot.on('callback_query', async (callbackQuery) => {
                             const photoInfo = photo.photo[0];
 
                             if (photoInfo && photoInfo.file_id) {
-                                for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: Crypto` });
-                                }
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedCrypto = true;
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: Crypto` });
+                                }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
                                 await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
@@ -2391,7 +2389,6 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!isNaN(enteredAmount)) {
                     const fundsUACardsText = `Вы можете произвести оплату ${enteredAmount}$ по украинской карте\n${copyCard}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsUACardsText, { parse_mode: 'HTML' });
-                    numberReceived = true
                     // Ожидание фото
                     while (!photoReceivedUaCard) {
                         try {
@@ -2399,11 +2396,11 @@ bot.on('callback_query', async (callbackQuery) => {
                             const photoInfo = photo.photo[0];
 
                             if (photoInfo && photoInfo.file_id) {
-                                for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: UA Card` });
-                                }
                                 await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
                                 photoReceivedUaCard = true;
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nЧерез: UA Card` });
+                                }
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
                                 await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
@@ -2465,7 +2462,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2537,7 +2534,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2609,7 +2606,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'farm_ua' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2668,7 +2665,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'auto_reg_ua' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2714,7 +2711,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2761,7 +2758,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm_fp' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2808,7 +2805,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'insta_bm_fp_rk' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2853,7 +2850,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_privat' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2898,7 +2895,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_monobank' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2943,7 +2940,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_a_bank' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -2987,7 +2984,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'cards_for_pb_sens' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -3037,7 +3034,7 @@ IP/Port/Log/Pass + информация
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_vodafone' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -3087,7 +3084,7 @@ IP/Port/Log/Pass + информация
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_life' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
@@ -3137,7 +3134,7 @@ IP/Port/Log/Pass + информация
                 });
 
                 // Добавляем кнопки "Вернуться назад"
-                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'proxy_kyivstar' });
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
 
                 const confirmPurchaseKeyboard = {
                     inline_keyboard: [
