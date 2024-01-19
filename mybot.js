@@ -3,7 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
 const adminUserIds = [
-    // 717989011,
+    717989011,
     709027639
 ];
 const bot = new TelegramBot(token, { polling: true });
