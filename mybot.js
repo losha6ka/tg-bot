@@ -2,7 +2,10 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
-const adminUserIds = [717989011, 709027639];
+const adminUserIds = [
+    // 717989011,
+    709027639
+];
 const bot = new TelegramBot(token, { polling: true });
 const db = new sqlite3.Database('mydatabase.db');
 const userStates = {}
@@ -1605,7 +1608,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!err && row) {
                     const profileKeyboard = {
                         inline_keyboard: [
-                            [{ text: `Логин: ${row.login}`, callback_data: 'show_login' }],
+                            [{ text: `Логин: ${row.login || userId}`, callback_data: 'show_login' }],
                             [{ text: `Баланс: ${row.balance}$`, callback_data: 'show_balance' }],
                             [{ text: `Сумма покупок: ${row.totalPurchases}$`, callback_data: 'show_purchases' }],
                             [{ text: 'Вернуться назад', callback_data: 'back_to_main' }],
@@ -2299,6 +2302,7 @@ bot.on('callback_query', async (callbackQuery) => {
             break;
         case 'binance_id':
             const inputBinanceMessage = await bot.sendMessage(chatId, 'Введите сумму в $:');
+            let photoReceivedBinance = false;
 
             bot.once('text', async (msg) => {
                 await bot.deleteMessage(chatId, inputBinanceMessage.message_id);
@@ -2309,65 +2313,74 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!isNaN(enteredAmount)) {
                     const fundsBinanceText = `Вы можете произвести оплату ${enteredAmount}$ по Binance\n${copyBinance}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsBinanceText, { parse_mode: 'HTML' });
-
+                    numberReceived = true
                     // Ожидание фото
-                    bot.once('photo', async (photo) => {
-                        const photoInfo = photo.photo[0];
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
-                        }
-                        for (const adminUserId of adminUserIds) {
+                    while (!photoReceivedBinance) {
+                        try {
+                            const photo = await new Promise((resolve) => bot.once('photo', resolve));
+                            const photoInfo = photo.photo[0];
+
                             if (photoInfo && photoInfo.file_id) {
-                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: Binance` });
+                                }
+                                await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
+                                photoReceivedBinance = true;
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
+                                await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
                             }
+                        } catch (error) {
+                            console.error('Ошибка при получении фото:', error.message);
                         }
-                    });
+                    }
                 } else {
-                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное число в $.');
+                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное числовое значение в $.');
                 }
             });
             break;
         case 'crypto':
             const inputCryptoMessage = await bot.sendMessage(chatId, 'Введите сумму в $:');
-            // Ожидание текстового сообщения
+            let photoReceivedCrypto = false;
+
             bot.once('text', async (msg) => {
                 await bot.deleteMessage(chatId, inputCryptoMessage.message_id);
 
                 const enteredAmount = parseFloat(msg.text);
-                const copyTron = `<code>TSgbGfsYGvCPNG7StbapVaNP727vrXBig9</code>`;
+                const copyBinance = `<code>TSgbGfsYGvCPNG7StbapVaNP727vrXBig9</code>`;
 
                 if (!isNaN(enteredAmount)) {
-                    const fundsCryptoText = `Вы можете произвести оплату ${enteredAmount}$ по Crypto\n${copyTron}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
+                    const fundsCryptoText = `Вы можете произвести оплату ${enteredAmount}$ по Crypto\n${copyBinance}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsCryptoText, { parse_mode: 'HTML' });
-
+                    numberReceived = true
                     // Ожидание фото
-                    bot.once('photo', async (photo) => {
-                        const photoInfo = photo.photo[0]
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
-                        }
-                        for (const adminUserId of adminUserIds) {
+                    while (!photoReceivedCrypto) {
+                        try {
+                            const photo = await new Promise((resolve) => bot.once('photo', resolve));
+                            const photoInfo = photo.photo[0];
+
                             if (photoInfo && photoInfo.file_id) {
-                                const userIdCopy = `${userId}`
-                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userIdCopy}` });
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: Crypto` });
+                                }
+                                await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
+                                photoReceivedCrypto = true;
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
+                                await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
                             }
+                        } catch (error) {
+                            console.error('Ошибка при получении фото:', error.message);
                         }
-                    });
+                    }
                 } else {
-                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное число в $.');
+                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное числовое значение в $.');
                 }
             });
             break;
         case 'ua_card':
             const inputUACardsMessage = await bot.sendMessage(chatId, 'Введите сумму в $:');
+            let photoReceivedUaCard = false;
 
             bot.once('text', async (msg) => {
                 await bot.deleteMessage(chatId, inputUACardsMessage.message_id);
@@ -2378,25 +2391,29 @@ bot.on('callback_query', async (callbackQuery) => {
                 if (!isNaN(enteredAmount)) {
                     const fundsUACardsText = `Вы можете произвести оплату ${enteredAmount}$ по украинской карте\n${copyCard}\nОтправьте чек об оплате (прикрепите одно фото, на котором видно подтверждение оплаты).`;
                     await bot.sendMessage(chatId, fundsUACardsText, { parse_mode: 'HTML' });
-
+                    numberReceived = true
                     // Ожидание фото
-                    bot.once('photo', async (photo) => {
-                        const photoInfo = photo.photo[0];
-                        if (photoInfo && photoInfo.file_id) {
-                            await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста ожидайте ответа.`);
-                        } else {
-                            console.error('Ошибка: Фото не содержит информацию о файле.');
-                        }
-                        for (const adminUserId of adminUserIds) {
+                    while (!photoReceivedUaCard) {
+                        try {
+                            const photo = await new Promise((resolve) => bot.once('photo', resolve));
+                            const photoInfo = photo.photo[0];
+
                             if (photoInfo && photoInfo.file_id) {
-                                await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}` });
+                                for (const adminUserId of adminUserIds) {
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nЧерез: UA Card` });
+                                }
+                                await bot.sendMessage(userId, `Заявка успешно отправлена саппортам. Пожалуйста, ожидайте ответа.`);
+                                photoReceivedUaCard = true;
                             } else {
                                 console.error('Ошибка: Фото не содержит информацию о файле.');
+                                await bot.sendMessage(chatId, 'Прикрепите фото с подтверждением оплаты.');
                             }
+                        } catch (error) {
+                            console.error('Ошибка при получении фото:', error.message);
                         }
-                    });
+                    }
                 } else {
-                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное число в $.');
+                    await bot.sendMessage(chatId, 'Пожалуйста, введите корректное числовое значение в $.');
                 }
             });
             break;
@@ -5220,7 +5237,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_2':
-            for (let i = 0; i > 2; i++) {
+            for (let i = 0; i < 2; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5258,7 +5275,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_3':
-            for (let i = 0; i > 3; i++) {
+            for (let i = 0; i < 3; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5296,7 +5313,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_4':
-            for (let i = 0; i > 4; i++) {
+            for (let i = 0; i < 4; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5334,7 +5351,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_5':
-            for (let i = 0; i > 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5372,7 +5389,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_6':
-            for (let i = 0; i > 6; i++) {
+            for (let i = 0; i < 6; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5410,7 +5427,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_7':
-            for (let i = 0; i > 7; i++) {
+            for (let i = 0; i < 7; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5448,7 +5465,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_8':
-            for (let i = 0; i > 8; i++) {
+            for (let i = 0; i < 8; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
@@ -5486,7 +5503,7 @@ IP/Port/Log/Pass + информация
             }
             break;
         case 'confirm_insta_bm_fp_rk_9':
-            for (let i = 0; i > 9; i++) {
+            for (let i = 0; i < 9; i++) {
                 try {
                     const instaBmFpRk = await getAvailableInstaBmFpRk(); // Получаем доступные автореги для пользователя
                     if (instaBmFpRk && instaBmFpRk.length > 0) {
