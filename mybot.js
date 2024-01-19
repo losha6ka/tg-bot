@@ -2365,7 +2365,7 @@ bot.on('callback_query', async (callbackQuery) => {
                                 photoReceivedCrypto = true;
                                 const userIdToCopyCrypto = `<code>👆${userId}</code>`
                                 for (const adminUserId of adminUserIds) {
-                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: /${userId}\nНик: ${userLogin}\nЧерез: Crypto` });
+                                    await bot.sendPhoto(adminUserId, photoInfo.file_id, { caption: `Фото платежа на сумму ${enteredAmount}$\nID: ${userId}\nНик: ${userLogin}\nЧерез: Crypto` });
                                     await bot.sendMessage(adminUserId, userIdToCopyCrypto, { parse_mode: 'HTML' });
 
                                 }
