@@ -2169,9 +2169,9 @@ bot.on('callback_query', async (callbackQuery) => {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
                             text: `Монобанк bin | ${price || 10}$ | Кол-во: ${mono.filter(reg => reg.price === price).length || 0}`,
-                            callback_data: `mono_info`
+                            callback_data: `monobank_info`
                         }]),
-                        ...(mono.length === 0 ? [[{ text: 'Монобанк bin | 0$ | Кол-во: 0', callback_data: 'mono_info' }]] : []),
+                        ...(mono.length === 0 ? [[{ text: 'Монобанк bin | 0$ | Кол-во: 0', callback_data: 'monobank_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -2488,9 +2488,9 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `UA фарм 30 дней | ${price || "ошибка"}$ | Кол-во: ${farmUa30D.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `ua_farm_30_days`
                         }]),
-                        ...(farmUa7D.length === 0 ? [[{ text: 'UA фарм 7 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
-                        ...(farmUa14D.length === 0 ? [[{ text: 'UA фарм 14 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
-                        ...(farmUa30D.length === 0 ? [[{ text: 'UA фарм 30 дней | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(farmUa7D.length === 0 ? [[{ text: 'UA фарм 7 дней | 0$ | Кол-во: 0', callback_data: 'ua_farm_7_days' }]] : []),
+                        ...(farmUa14D.length === 0 ? [[{ text: 'UA фарм 14 дней | 0$ | Кол-во: 0', callback_data: 'ua_farm_14_days' }]] : []),
+                        ...(farmUa30D.length === 0 ? [[{ text: 'UA фарм 30 дней | 0$ | Кол-во: 0', callback_data: 'ua_farm_30_days' }]] : []),
 
                         [{ text: 'Вернуться назад', callback_data: 'manual_farm' }],
                     ],
