@@ -4,7 +4,6 @@ const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
 const adminUserIds = [
     717989011,
-    709027639,
     5343154126,
     6445079871
 ];
