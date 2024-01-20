@@ -4,7 +4,9 @@ const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
 const adminUserIds = [
     717989011,
-    709027639
+    709027639,
+    5343154126,
+    6445079871
 ];
 const bot = new TelegramBot(token, { polling: true });
 const db = new sqlite3.Database('mydatabase.db');
@@ -23,6 +25,20 @@ db.run(`
 // autoreg
 db.run(`
     CREATE TABLE IF NOT EXISTS auto_reg_links (
+        id INTEGER PRIMARY KEY,
+        link TEXT,
+        price INTEGER
+    );
+`);
+db.run(`
+    CREATE TABLE IF NOT EXISTS auto_reg_fp_links (
+        id INTEGER PRIMARY KEY,
+        link TEXT,
+        price INTEGER
+    );
+`);
+db.run(`
+    CREATE TABLE IF NOT EXISTS auto_reg_fp_pk_links (
         id INTEGER PRIMARY KEY,
         link TEXT,
         price INTEGER
@@ -183,6 +199,8 @@ bot.onText(/\/help/, async (msg) => {
 \nПополнить счёт пользователя - /add_funds 
 \nДобавить пост -  /add_post
 \nДобавить авторег -  /add_auto_reg
+\nДобавить авторег Fp -  /add_auto_fp
+\nДобавить авторег Fp Pk -  /add_auto_pk
 \nДобавить Farm UA 7дней - /add_farm_ua_7d
 \nДобавить Farm UA 14дней - /add_farm_ua_14d
 \nДобавить Farm UA 30дней - /add_farm_ua_30d
@@ -616,6 +634,34 @@ async function removeAutoReg(autoRegId) {
         });
     });
 }
+async function removeAutoRegFp(autoRegId) {
+    return new Promise((resolve, reject) => {
+        // Удаляем запись из auto_reg_links
+        db.run("DELETE FROM auto_reg_fp_links WHERE id = ?", [autoRegId], function (err) {
+            if (err) {
+                console.error('Ошибка при удалении авторега:', err);
+                reject(err);
+            } else {
+                // Здесь вы можете добавить дополнительные действия, если нужно
+                resolve();
+            }
+        });
+    });
+}
+async function removeAutoRegFpPk(autoRegId) {
+    return new Promise((resolve, reject) => {
+        // Удаляем запись из auto_reg_links
+        db.run("DELETE FROM auto_reg_fp_pk_links WHERE id = ?", [autoRegId], function (err) {
+            if (err) {
+                console.error('Ошибка при удалении авторега:', err);
+                reject(err);
+            } else {
+                // Здесь вы можете добавить дополнительные действия, если нужно
+                resolve();
+            }
+        });
+    });
+}
 // 
 async function getUserById(userId) {
     return new Promise((resolve, reject) => {
@@ -661,6 +707,90 @@ bot.onText(/\/add_auto_reg/, async (msg) => {
 
                     // Получаем обновленный список доступных авторегов
                     const autoRegs = await getAvailableAutoRegs(userId);
+
+                    // Отправляем обновленный список пользователю
+                });
+            });
+        } catch (error) {
+            console.error('Произошла ошибка при добавлении ссылки:', error);
+            await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+        }
+    }
+});
+bot.onText(/\/add_auto_fp/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    if (adminUserIds.includes(userId)) {
+
+
+        try {
+            const priceMessage = await bot.sendMessage(chatId, 'Введите цену авторега fp:');
+
+            bot.once('text', async (msg) => {
+                const price = parseFloat(msg.text);
+
+                if (isNaN(price)) {
+                    await bot.sendMessage(chatId, 'Некорректная цена. Пожалуйста, введите числовое значение.');
+                    return;
+                }
+
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
+
+                bot.once('text', async (msg) => {
+                    const links = msg.text.split('\n');
+
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addAutoRegFpLink(link, price);
+                    }
+
+                    // Опционально: Отправьте сообщение об успешном добавлении
+                    await bot.sendMessage(chatId, 'Авторег fp успешно добавлен.');
+
+                    // Получаем обновленный список доступных авторегов
+                    const autoRegs = await getAvailableAutoRegsFp(userId);
+
+                    // Отправляем обновленный список пользователю
+                });
+            });
+        } catch (error) {
+            console.error('Произошла ошибка при добавлении ссылки:', error);
+            await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+        }
+    }
+});
+bot.onText(/\/add_auto_pk/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    if (adminUserIds.includes(userId)) {
+
+
+        try {
+            const priceMessage = await bot.sendMessage(chatId, 'Введите цену авторега fp pk:');
+
+            bot.once('text', async (msg) => {
+                const price = parseFloat(msg.text);
+
+                if (isNaN(price)) {
+                    await bot.sendMessage(chatId, 'Некорректная цена. Пожалуйста, введите числовое значение.');
+                    return;
+                }
+
+                const linksMessage = await bot.sendMessage(chatId, 'Введите ссылки на Google Диск (каждая ссылка с новой строки):');
+
+                bot.once('text', async (msg) => {
+                    const links = msg.text.split('\n');
+
+                    // Проход по каждой ссылке и добавление в базу данных
+                    for (const link of links) {
+                        await addAutoRegFpPkLink(link, price);
+                    }
+
+                    // Опционально: Отправьте сообщение об успешном добавлении
+                    await bot.sendMessage(chatId, 'Авторег fp pk успешно добавлен.');
+
+                    // Получаем обновленный список доступных авторегов
+                    const autoRegs = await getAvailableAutoRegsFpPk(userId);
 
                     // Отправляем обновленный список пользователю
                 });
@@ -1209,22 +1339,38 @@ bot.onText(/\/add_proxy_kyivstar/, async (msg) => {
     }
 });
 // 
-async function getAvailableAutoRegs() {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM auto_reg_links", (err, rows) => {
-            if (err) {
-                console.error('Ошибка при получении списка доступных авторегов:', err);
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
 async function addAutoRegLink(link, price) {
     return new Promise((resolve, reject) => {
         // Вставляем новую запись в auto_reg_links
         db.run("INSERT INTO auto_reg_links ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
+            if (err) {
+                console.error('Ошибка при добавлении ссылки на авторег:', err);
+                reject(err);
+            } else {
+                const autoRegId = this.lastID; // ID только что вставленной записи
+                resolve({ id: autoRegId, price, link });
+            }
+        });
+    });
+}
+async function addAutoRegFpLink(link, price) {
+    return new Promise((resolve, reject) => {
+        // Вставляем новую запись в auto_reg_links
+        db.run("INSERT INTO auto_reg_fp_links ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
+            if (err) {
+                console.error('Ошибка при добавлении ссылки на авторег:', err);
+                reject(err);
+            } else {
+                const autoRegId = this.lastID; // ID только что вставленной записи
+                resolve({ id: autoRegId, price, link });
+            }
+        });
+    });
+}
+async function addAutoRegFpPkLink(link, price) {
+    return new Promise((resolve, reject) => {
+        // Вставляем новую запись в auto_reg_links
+        db.run("INSERT INTO auto_reg_fp_pk_links ( link, price) VALUES ( ?, ?)", [link, price], function (err) {
             if (err) {
                 console.error('Ошибка при добавлении ссылки на авторег:', err);
                 reject(err);
@@ -1418,6 +1564,42 @@ async function addProxyKyivstarLink(link, price) {
     });
 }
 // 
+async function getAvailableAutoRegs() {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT * FROM auto_reg_links", (err, rows) => {
+            if (err) {
+                console.error('Ошибка при получении списка доступных авторегов:', err);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+async function getAvailableAutoRegsFp() {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT * FROM auto_reg_fp_links", (err, rows) => {
+            if (err) {
+                console.error('Ошибка при получении списка доступных авторегов:', err);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+async function getAvailableAutoRegsFpPk() {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT * FROM auto_reg_fp_pk_links", (err, rows) => {
+            if (err) {
+                console.error('Ошибка при получении списка доступных авторегов:', err);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
 async function getAvailableFarmUa7D() {
     return new Promise((resolve, reject) => {
         db.all("SELECT * FROM farm_ua_links7d", (err, rows) => {
@@ -1594,6 +1776,46 @@ async function sendAutoRegLinks(userId, quantity) {
         throw error;
     }
 }
+async function sendAutoRegFpLinks(userId, quantity) {
+    try {
+        const autoRegs = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+        const balance = await getBalance(userId)
+        if (autoRegs.length > 0) {
+            for (let i = 0; i < quantity; i++) {
+                const autoReg = autoRegs[i];
+                // Отправляем ссылку на каждый авторег
+                await bot.sendMessage(userId, `Ваш товар: ${autoReg.link}\nВаш баланс: ${balance}$`);
+            }
+        } else {
+            await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+            console.error('Ошибка при получении информации об автореге.');
+        }
+    } catch (error) {
+        console.error('Произошла ошибка при отправке авторегов:', error);
+        throw error;
+    }
+}
+async function sendAutoRegFpPkLinks(userId, quantity) {
+    try {
+        const autoRegs = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+        const balance = await getBalance(userId)
+        if (autoRegs.length > 0) {
+            for (let i = 0; i < quantity; i++) {
+                const autoReg = autoRegs[i];
+                // Отправляем ссылку на каждый авторег
+                await bot.sendMessage(userId, `Ваш товар: ${autoReg.link}\nВаш баланс: ${balance}$`);
+            }
+        } else {
+            await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+            console.error('Ошибка при получении информации об автореге.');
+        }
+    } catch (error) {
+        console.error('Произошла ошибка при отправке авторегов:', error);
+        throw error;
+    }
+}
 // 
 bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
@@ -1697,18 +1919,32 @@ bot.on('callback_query', async (callbackQuery) => {
         case 'auto_reg_ua':
             try {
                 const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
+                const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
 
                 // Используем объект Set для хранения уникальных цен
                 const uniquePrices = new Set(autoRegs.map(autoReg => autoReg.price));
+                const uniquePricesFp = new Set(autoRegsFp.map(autoReg => autoReg.price));
+                const uniquePricesFpPK = new Set(autoRegsFpPk.map(autoReg => autoReg.price));
                 // Формируем клавиатуру с уникальными ценами
                 const autoRegUaText = 'Авторег UA';
                 const autoRegUaKeyboard = {
                     inline_keyboard: [
                         ...Array.from(uniquePrices).map(price => [{
-                            text: `Авторег UA + FP | ${price || 0}$ | Кол-во: ${autoRegs.filter(reg => reg.price === price).length || 0}`,
+                            text: `Авторег UA | ${price || 0}$ | Кол-во: ${autoRegs.filter(reg => reg.price === price).length || 0}`,
+                            callback_data: `auto_reg_ua_info`
+                        }]),
+                        ...Array.from(uniquePricesFp).map(price => [{
+                            text: `Авторег UA + FP | ${price || 0}$ | Кол-во: ${autoRegsFp.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `auto_reg_ua_fp`
                         }]),
-                        ...(autoRegs.length === 0 ? [[{ text: 'Авторег UA + FP | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...Array.from(uniquePricesFpPK).map(price => [{
+                            text: `Авторег UA + FP + PK | ${price || 0}$ | Кол-во: ${autoRegsFpPk.filter(reg => reg.price === price).length || 0}`,
+                            callback_data: `auto_reg_ua_fp_pk`
+                        }]),
+                        ...(autoRegs.length === 0 ? [[{ text: 'Авторег UA | 0$ | Кол-во: 0', callback_data: 'auto_reg_ua_info' }]] : []),
+                        ...(autoRegsFp.length === 0 ? [[{ text: 'Авторег UA + FP | 0$ | Кол-во: 0', callback_data: 'auto_reg_ua_fp' }]] : []),
+                        ...(autoRegsFpPk.length === 0 ? [[{ text: 'Авторег UA + FP + PK | 0$ | Кол-во: 0', callback_data: 'auto_reg_ua_fp_pk' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'auto_reg' }],
                     ],
                 };
@@ -1768,7 +2004,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Insta BM | ${price || 10}$ | Кол-во: ${instaBms.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_info`
                         }]),
-                        ...(instaBms.length === 0 ? [[{ text: 'Insta BM | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(instaBms.length === 0 ? [[{ text: 'Insta BM | 0$ | Кол-во: 0', callback_data: 'insta_bm_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
                 };
@@ -1804,7 +2040,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Insta BM + FP | ${price || 10}$ | Кол-во: ${instaBmsFp.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_fp_info`
                         }]),
-                        ...(instaBmsFp.length === 0 ? [[{ text: 'Insta BM + FP | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(instaBmsFp.length === 0 ? [[{ text: 'Insta BM + FP | 0$ | Кол-во: 0', callback_data: 'insta_bm_fp_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
                 };
@@ -1840,7 +2076,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Insta BM + FP + PK | ${price || 10}$ | Кол-во: ${instaBmsFpRk.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `insta_bm_fp_rk_info`
                         }]),
-                        ...(instaBmsFpRk.length === 0 ? [[{ text: 'Insta BM + FP + PK | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(instaBmsFpRk.length === 0 ? [[{ text: 'Insta BM + FP + PK | 0$ | Кол-во: 0', callback_data: 'insta_bm_fp_rk_info' }]] : []),
 
                         [{ text: 'Вернуться назад', callback_data: 'business_manager' }],
                     ],
@@ -1902,7 +2138,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Приват bin | ${price || 10}$ | Кол-во: ${privats.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `privat_info`
                         }]),
-                        ...(privats.length === 0 ? [[{ text: 'Приват bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(privats.length === 0 ? [[{ text: 'Приват bin | 0$ | Кол-во: 0', callback_data: 'privat_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1935,7 +2171,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Монобанк bin | ${price || 10}$ | Кол-во: ${mono.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `mono_info`
                         }]),
-                        ...(mono.length === 0 ? [[{ text: 'Монобанк bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(mono.length === 0 ? [[{ text: 'Монобанк bin | 0$ | Кол-во: 0', callback_data: 'mono_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -1968,7 +2204,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `А-банк bin | ${price || 10}$ | Кол-во: ${abank.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `a_bank_info`
                         }]),
-                        ...(abank.length === 0 ? [[{ text: 'А-банк bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(abank.length === 0 ? [[{ text: 'А-банк bin | 0$ | Кол-во: 0', callback_data: 'a_bank_info' }]] : []),
 
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
@@ -2002,7 +2238,7 @@ bot.on('callback_query', async (callbackQuery) => {
                             text: `Сенс bin | ${price || 10}$ | Кол-во: ${sens.filter(reg => reg.price === price).length || 0}`,
                             callback_data: `sens_info`
                         }]),
-                        ...(sens.length === 0 ? [[{ text: 'Сенс bin | 0$ | Кол-во: 0', callback_data: 'none' }]] : []),
+                        ...(sens.length === 0 ? [[{ text: 'Сенс bin | 0$ | Кол-во: 0', callback_data: 'sens_info' }]] : []),
                         [{ text: 'Вернуться назад', callback_data: 'cards_for_pb' }],
                     ],
                 };
@@ -2638,13 +2874,13 @@ bot.on('callback_query', async (callbackQuery) => {
             }
 
             break;
-        case 'auto_reg_ua_fp':
+        case 'auto_reg_ua_info':
             const autoRegs = await getAvailableAutoRegs(); // Получаем доступные автореги для пользователя
 
             if (autoRegs.length > 0) {
                 const firstAutoRegPrice = autoRegs[0].price;
                 const autoRegUaFpMessage = `
-*--- Авторег UA + FP ---*
+*--- Авторег UA ---*
 
 **Описание:**
 Стабильные автореги, подходящие для любых задач - автозалив, ручной залив, линковка к кингу, дофарм и создание крепкого кинга и т.д. Аккаунты UA, готовы для рекламы.
@@ -2669,6 +2905,122 @@ bot.on('callback_query', async (callbackQuery) => {
                 const buttonsToShow = autoRegs.slice(0, 9).map((_, index) => {
                     const buttonText = `${index + 1}шт`;
                     const callbackData = `confirm_purchase_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
+
+                const confirmPurchaseKeyboard = {
+                    inline_keyboard: [
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
+                    ]
+                };
+
+                // Отправляем сообщение с описанием и кнопкой подтверждения
+                await bot.sendMessage(chatId, autoRegUaFpMessage, {
+                    parse_mode: 'Markdown',
+                    reply_markup: confirmPurchaseKeyboard
+                });
+            } else {
+                // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                console.error('Ошибка при получении информации об автореге.');
+            }
+            break;
+        case 'auto_reg_ua_fp':
+            const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+
+            if (autoRegsFp.length > 0) {
+                const firstAutoRegPrice = autoRegsFp[0].price;
+                const autoRegUaFpMessage = `
+*--- Авторег UA + FP ---*
+
+**Описание:**
+Стабильные автореги, подходящие для любых задач - автозалив, ручной залив, линковка к кингу, дофарм и создание крепкого кинга и т.д. Аккаунты UA, готовы для рекламы.
+
+**Дополнительно:**
+- Установлена аватарка
+- Заполнен город/работа и т.д.
+- Имена и фамилии на украинском языке
+- Пол - женский
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- EAAB-токен в комплекте.
+
+**ЦЕНА:** ${firstAutoRegPrice}$
+**ОСТАТОК:** ${autoRegsFp.length || 0}
+                    `;
+                const buttonsToShow = autoRegsFp.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_autoreg_fp_${index + 1}`;
+                    return { text: buttonText, callback_data: callbackData };
+                });
+
+                // Добавляем кнопки "Вернуться назад"
+                buttonsToShow.push({ text: 'Вернутся назад', callback_data: 'buy' });
+
+                const confirmPurchaseKeyboard = {
+                    inline_keyboard: [
+                        buttonsToShow.slice(0, 3),
+                        buttonsToShow.slice(3, 6),
+                        buttonsToShow.slice(6, 9),
+                        buttonsToShow.slice(9, 10),
+                    ]
+                };
+
+                // Отправляем сообщение с описанием и кнопкой подтверждения
+                await bot.sendMessage(chatId, autoRegUaFpMessage, {
+                    parse_mode: 'Markdown',
+                    reply_markup: confirmPurchaseKeyboard
+                });
+            } else {
+                // Обработка ошибки, если не удалось получить информацию об автореге
+                await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                console.error('Ошибка при получении информации об автореге.');
+            }
+            break;
+        case 'auto_reg_ua_fp_pk':
+            const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+
+            if (autoRegsFpPk.length > 0) {
+                const firstAutoRegPrice = autoRegsFpPk[0].price;
+                const autoRegUaFpMessage = `
+*--- Авторег UA + FP + PK ---*
+
+**Описание:**
+Стабильные автореги, подходящие для любых задач - автозалив, ручной залив, линковка к кингу, дофарм и создание крепкого кинга и т.д. Аккаунты UA, готовы для рекламы.
+
+**Дополнительно:**
+- Установлена аватарка
+- Заполнен город/работа и т.д.
+- Имена и фамилии на украинском языке
+- Пол - женский
+
+**В комплекте:**
+- Логин/пароль аккаунта ФБ + почта
+- Дата рождения
+- ID аккаунта
+- Cookies .JSON
+- USERAGENT
+- EAAB-токен в комплекте.
+
+**ЦЕНА:** ${firstAutoRegPrice}$
+**ОСТАТОК:** ${autoRegsFpPk.length || 0}
+                    `;
+                const buttonsToShow = autoRegsFpPk.slice(0, 9).map((_, index) => {
+                    const buttonText = `${index + 1}шт`;
+                    const callbackData = `confirm_autoreg_fp_pk_${index + 1}`;
                     return { text: buttonText, callback_data: callbackData };
                 });
 
@@ -2761,7 +3113,7 @@ bot.on('callback_query', async (callbackQuery) => {
             `;
                 const buttonsToShow = instaBmFp.slice(0, 9).map((_, index) => {
                     const buttonText = `${index + 1}шт`;
-                    const callbackData = `confirm_insta_bm_fp_${index + 1}`;
+                    const callbackData = `confirm_autoreg_fp_${index + 1}`;
                     return { text: buttonText, callback_data: callbackData };
                 });
 
@@ -2808,7 +3160,7 @@ bot.on('callback_query', async (callbackQuery) => {
             `;
                 const buttonsToShow = instaBmFpRk.slice(0, 9).map((_, index) => {
                     const buttonText = `${index + 1}шт`;
-                    const callbackData = `confirm_insta_bm_fp_rk_${index + 1}`;
+                    const callbackData = `confirm_autoreg_fp_pk_${index + 1}`;
                     return { text: buttonText, callback_data: callbackData };
                 });
 
@@ -3493,6 +3845,668 @@ IP/Port/Log/Pass + информация
                         // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
                         const updatedAutoReg = await getAvailableAutoRegs();
 
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_1':
+            try {
+                const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                if (autoRegsFp && autoRegsFp.length > 0) {
+                    const autoRegFp = autoRegsFp[0];
+
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < autoRegFp.price) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
+                    }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, autoRegFp.price);
+
+                    // Удаляем авторег из базы данных
+                    await removeAutoRegFp(autoRegFp.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    await sendAutoRegFpLinks(userId, 1);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                } else {
+                    // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                    console.error('Ошибка при получении информации об автореге.');
+                }
+            } catch (error) {
+                console.error('Произошла ошибка при подтверждении покупки:', error);
+                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_autoreg_fp_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const autoRegsFp = await getAvailableAutoRegsFp(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFp && autoRegsFp.length > 0) {
+                        const autoRegFp = autoRegsFp[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFp.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFp.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFp(autoRegFp.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoRegFp = await getAvailableAutoRegsFp();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_1':
+            try {
+                const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                    const autoRegFpPk = autoRegsFpPk[0];
+
+                    // Проверяем, достаточно ли средств на балансе
+                    const user = await getUserById(userId);
+                    if (user.balance < autoRegFpPk.price) {
+                        await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                        return;
+                    }
+
+                    // Списываем с баланса пользователя цену авторега
+                    await deductBalance(userId, autoRegFpPk.price);
+
+                    // Удаляем авторег из базы данных
+                    await removeAutoRegFpPk(autoRegFpPk.id);
+
+                    // Отправляем пользователю сообщение об успешной покупке
+                    await sendAutoRegFpPkLinks(userId, 1);
+
+                    // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                    const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                } else {
+                    // Обработка ошибки, если не удалось получить информацию об автореге
+                    await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                    console.error('Ошибка при получении информации об автореге.');
+                }
+            } catch (error) {
+                console.error('Произошла ошибка при подтверждении покупки:', error);
+                await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_2':
+            for (let i = 0; i < 2; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_3':
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_4':
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_5':
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_6':
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_7':
+            for (let i = 0; i < 7; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_8':
+            for (let i = 0; i < 8; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
+                    } else {
+                        // Обработка ошибки, если не удалось получить информацию об автореге
+                        await bot.sendMessage(chatId, 'Товара нет в наличии');
+
+                        console.error('Ошибка при получении информации об автореге.');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка при подтверждении покупки:', error);
+                    await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+                }
+            }
+            break;
+        case 'confirm_autoreg_fp_pk_9':
+            for (let i = 0; i < 9; i++) {
+                try {
+                    const autoRegsFpPk = await getAvailableAutoRegsFpPk(); // Получаем доступные автореги для пользователя
+                    if (autoRegsFpPk && autoRegsFpPk.length > 0) {
+                        const autoRegFpPk = autoRegsFpPk[0];
+
+                        // Проверяем, достаточно ли средств на балансе
+                        const user = await getUserById(userId);
+                        if (user.balance < autoRegFpPk.price) {
+                            await bot.sendMessage(chatId, 'Недостаточно средств на балансе. Пополните баланс для продолжения.');
+                            return;
+                        }
+
+                        // Списываем с баланса пользователя цену авторега
+                        await deductBalance(userId, autoRegFpPk.price);
+
+                        // Удаляем авторег из базы данных
+                        await removeAutoRegFpPk(autoRegFpPk.id);
+
+                        // Отправляем пользователю сообщение об успешной покупке
+                        await sendAutoRegFpPkLinks(userId, 1);
+
+                        // Возможно, здесь вы захотите обновить информацию об авторегах после покупки
+                        const updatedAutoReg = await getAvailableAutoRegsFpPk();
                     } else {
                         // Обработка ошибки, если не удалось получить информацию об автореге
                         await bot.sendMessage(chatId, 'Товара нет в наличии');
