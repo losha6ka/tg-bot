@@ -204,8 +204,8 @@ bot.onText(/\/help/, async (msg) => {
 \nДобавить Farm UA 14дней - /add_farm_ua_14d
 \nДобавить Farm UA 30дней - /add_farm_ua_30d
 \nДобавить Insta BM - /add_insta_bm
-\nДобавить Insta BM + FP - /add_insta_rk
-\nДобавить Insta BM + FP + RK - /add_insta_fp
+\nДобавить Insta BM + FP - /add_insta_fp
+\nДобавить Insta BM + FP + RK - /add_insta_rk 
 \nДобавить ПБ приват - /add_pb_privat
 \nДобавить ПБ моно - /add_pb_mono
 \nДобавить ПБ абанк - /add_pb_abank
@@ -3159,7 +3159,7 @@ bot.on('callback_query', async (callbackQuery) => {
             `;
                 const buttonsToShow = instaBmFpRk.slice(0, 9).map((_, index) => {
                     const buttonText = `${index + 1}шт`;
-                    const callbackData = `confirm_autoreg_fp_pk_${index + 1}`;
+                    const callbackData = `confirm_insta_bm_fp_rk_${index + 1}`;
                     return { text: buttonText, callback_data: callbackData };
                 });
 
